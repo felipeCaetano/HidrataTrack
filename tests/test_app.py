@@ -42,11 +42,11 @@ def test_progress_does_not_exceed_100(tracker):
     tracker.add_water(4000)
     assert tracker.get_progress() == 100
 
-def test_custom_goal_recalculation(user):
+def test_custom_goal_recalculation(profile):
     """Testa se a meta diária recalcula corretamente ao alterar o peso do usuário."""
-    tracker = WaterTracker(user)
+    tracker = WaterTracker(profile)
     assert tracker.daily_goal == 4000  # 80kg -> 4L
 
-    user.peso = 60  # Altera o peso do usuário
+    profile.peso = 60  # Altera o peso do usuário
     tracker.daily_goal = tracker.calculate_daily_goal()  # Recalcula a meta
     assert tracker.daily_goal == 3000  # 60kg -> 3L
