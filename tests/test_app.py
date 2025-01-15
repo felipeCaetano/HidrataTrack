@@ -50,3 +50,33 @@ def test_custom_goal_recalculation(profile):
     profile.peso = 60  # Altera o peso do usuário
     tracker.daily_goal = tracker.calculate_daily_goal()  # Recalcula a meta
     assert tracker.daily_goal == 3000  # 60kg -> 3L
+
+from unittest.mock import Mock
+from src.hidratatrack.main import HidrataTrackApp
+
+def test_login_with_existing_profile():
+    """Testa se o login com um perfil existente redireciona para a tela de rastreamento."""
+    # Inicializar o aplicativo
+    app = HidrataTrackApp()
+    app.build()
+
+    # Mockar o usuário com um perfil existente
+    app.user = Mock()
+    # app.user.profile = {
+    #     "nome": "Test User",
+    #     "peso": 70,
+    #     "data_nascimento": "1990-01-01",
+    #     "genero": "Masculino",
+    #     "detalhes": []
+    # }
+    app.user.set_profile("Test User", 70)
+
+    # Mockar as credenciais de login
+    app.sm.get_screen("login").ids.login.text = "test"
+    app.sm.get_screen("login").ids.password.text = "1234"
+
+    # Autenticar o usuário
+    app.authenticate_user()
+
+    # Verificar se a tela foi trocada para o rastreador
+    assert app.sm.current == "tracker", "O login com perfil existente não redirecionou para a tela de rastreamento"

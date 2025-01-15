@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import ROUND_UP, Decimal
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 from kivymd.app import MDApp
@@ -11,6 +12,7 @@ from kivy.properties import StringProperty
 from kivy.clock import Clock
 
 from user import User
+from water_tracker import WaterTracker
 
 # KivyMD Builder String for Layout
 KV = '''
@@ -122,6 +124,7 @@ ScreenManager:
                         id: gender_select
                         pos_hint: {"center_x": .5, "center_y": .5}
                         # size_hint_x: .7
+                        current_active_segment: male
                         on_active: app.on_gender_select(*args)
                         
                         MDSegmentedControlItem:
@@ -143,7 +146,7 @@ ScreenManager:
                     DateField:
                         id: birth_date
                         hint_text: "Data de Nascimento"
-                        helper_text: "Digite sua data de nascimento (DDMMAAAA)"
+                        helper_text: "Digite sua data de nascimento (DD/MM/AAAA)"
                         helper_text_mode: "on_focus"
                         icon_right: "calendar"
                         size_hint_y: None
@@ -249,16 +252,19 @@ class DateField(MDTextField):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.input_filter = self.filter_date
+        self.on_text_validate = self.filter_date
+        self.validator = 'date'
+        self.date_format = 'dd/mm/yyyy'
         self._previous_value = ''
         
-    def filter_date(self, value, boolean):
+    def filter_date(self, *args):
+        print(args)
         # Remove qualquer caractere não numérico
-        numbers = ''.join(filter(str.isdigit, value))
-        
+        numbers = ''.join(filter(str.isdigit, self.text))
+
         if len(numbers) > 8:
             numbers = numbers[:8]
-            
+
         # Formata a data conforme digita
         formatted = ''
         if len(numbers) > 0:
@@ -267,13 +273,16 @@ class DateField(MDTextField):
             formatted += '/' + numbers[2:4]
         if len(numbers) > 4:
             formatted += '/' + numbers[4:8]
-            
+
         # Atualiza o texto do campo apenas se houver mudança
         if formatted != self._previous_value:
             self._previous_value = formatted
-            Clock.schedule_once(lambda dt: self.update_text(formatted))
-            
-        return ''  # Retorna vazio pois vamos atualizar o texto via update_text
+            self.text = formatted  # Atualiza o texto diretamente
+            self.formatted_date = formatted  # Sincroniza a data formatada
+
+        # Retorna vazio pois a atualização já foi feita diretamente
+        return ''
+
     
     def update_text(self, formatted_text):
         self.text = formatted_text
@@ -282,7 +291,7 @@ class DateField(MDTextField):
     def get_date(self):
         """Converte a data formatada para objeto datetime"""
         try:
-            if len(self.formatted_date) == 10:  # Formato completo DD/MM/YYYY
+            if 8<= len(self.formatted_date) < 11:  # Formato completo DD/MM/YYYY
                 return datetime.strptime(self.formatted_date, '%d/%m/%Y')
             return None
         except ValueError:
@@ -329,7 +338,8 @@ class HidrataTrackApp(MDApp):
         """Create a user profile and calculate the daily water goal."""
         user_name = self.sm.get_screen("create_profile").ids.name.text
         birth_date_field = self.sm.get_screen("create_profile").ids.birth_date
-        weight = self.sm.get_screen("create_profile").ids.weight.text
+        user_weight = self.sm.get_screen("create_profile").ids.weight.text
+        gender = self.sm.get_screen("create_profile").ids.gender_select.current_active_segment.text
 
         # Validação da data
         birth_date = birth_date_field.get_date()
@@ -341,12 +351,20 @@ class HidrataTrackApp(MDApp):
             print("Por favor, preencha todos os campos.")
             return
 
-        self.user = {
-            "name": user_name,
-            "weight": float(user_weight),
+        user = {
+            "nome": user_name,
+            "peso": float(user_weight),
+            "data_nascimento": birth_date,
+            "genero": gender,
+            "detalhes": []
         }
-        self.daily_goal = (float(user_weight) / 20) * 1000
-        print(f"Perfil criado: {self.user}")
+        print(user)
+        # Profile(nome, genero, data_nascimento, peso, detalhes)
+        self.user.set_profile(user["nome"], user['peso'])
+        self.daily_goal = self.user.profile.daily_goal
+        if self.user.profile is not None:
+            print(f"Perfil criado: {self.user}")
+            self.switch_to_tracker()
 
     def switch_to_create_account(self):
         ...
@@ -358,15 +376,17 @@ class HidrataTrackApp(MDApp):
             return
 
         tracker_screen = self.sm.get_screen("tracker")
-        tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {self.daily_goal} ml"
-        tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} ml"
+        tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {Decimal(self.daily_goal).quantize(Decimal('1.'), rounding=ROUND_UP)} mL"
+        tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} mL"
+        self.water_tracker = WaterTracker(self.user)
         self.sm.current = "tracker"
 
     def add_water(self, amount):
         """Add water to the progress and update the tracker screen."""
-        self.progress += amount
+        self.water_tracker.add_water(amount)
+        self.progress = self.water_tracker.current_intake
         tracker_screen = self.sm.get_screen("tracker")
-        tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} ml"
+        tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} mL"
 
     def switch_to_profile(self):
         """Switch to the profile screen."""

@@ -8,6 +8,7 @@ class Profile:
         self.data_nascimento = data_nascimento
         self.idade = self.get_age()
         self.peso = peso
+        self.daily_goal = self.calculate_goal(self.peso)
         self.detalhes = detalhes
         self.observers = []
 
@@ -28,6 +29,9 @@ class Profile:
         if (today.month, today.day) < (self.data_nascimento.month, self.data_nascimento.day):
             age -= 1
         return age
+    
+    def calculate_goal(self, peso):
+        return (float(peso) / 20) * 1000
     
     def update_weight(self, value):
         """Atualiza o valor do peso do usuário para value"""
