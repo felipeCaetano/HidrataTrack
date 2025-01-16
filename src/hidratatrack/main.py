@@ -4,20 +4,22 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.button import MDRaisedButton, MDFillRoundFlatIconButton
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivy.properties import StringProperty
+
 from kivy.clock import Clock
 
 from user import User
 from water_tracker import WaterTracker
+from datefield import DateField
 
 # KivyMD Builder String for Layout
 KV = '''
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import DateField datefield
 
 ScreenManager:
     transition: FadeTransition()
@@ -89,6 +91,7 @@ ScreenManager:
                         size_hint_x: .8
                         md_bg_color: get_color_from_hex("#4CAF50")
                         on_release: app.switch_to_create_account()
+
 <CreateProfileScreen>:
     name: "create_profile"
     
@@ -161,6 +164,13 @@ ScreenManager:
                         icon_right: "weight-kilogram"
                         input_filter: "float"
                         write_tab: False
+                    
+                    MDTextField:
+                        id: details
+                        multiline: True
+                        mode: "rectangle"
+                        hint_text: "Detalhes adicionais"
+                        write_tab: False
                         
                     MDRaisedButton:
                         text: "Salvar Perfil"
@@ -196,14 +206,14 @@ ScreenManager:
                     
                     MDLabel:
                         id: daily_goal_label
-                        text: "Meta Diária: 0 ml"
+                        text: "Meta Diária: 0 mL"
                         halign: "center"
                         theme_text_color: "Primary"
                         font_style: "H6"
                         
                     MDLabel:
                         id: progress_label
-                        text: "Progresso: 0 ml"
+                        text: "Progresso: 0 mL"
                         halign: "center"
                         theme_text_color: "Secondary"
                         
@@ -215,25 +225,55 @@ ScreenManager:
                         pos_hint: {"center_x": .5}
                         
                     MDBoxLayout:
-                        orientation: "horizontal"
+                        orientation: "vertical"
                         spacing: "10dp"
                         adaptive_height: True
                         pos_hint: {"center_x": .5}
                         
-                        MDRaisedButton:
-                            text: "100ml"
-                            on_release: app.add_water(100)
-                            md_bg_color: get_color_from_hex("#2196F3")
+                        MDBoxLayout:
+                            orientation: "horizontal"
+                            adaptive_height: True
+                            spacing: "10dp"
+
+                            MDTextField:
+                                id: water_add
+                                mode: "rectangle"
+                                hint_text: "Volume bebido."
+                                helper_text: "Digite o volume em mL"
+                                helper_text_mode: "on_focus"
+                                #icon_right: "water-plus"
+                                input_filter: "float"
+                                write_tab: False
                             
-                        MDRaisedButton:
-                            text: "200ml"
-                            on_release: app.add_water(200)
-                            md_bg_color: get_color_from_hex("#2196F3")
-                            
-                        MDRaisedButton:
-                            text: "300ml"
-                            on_release: app.add_water(300)
-                            md_bg_color: get_color_from_hex("#2196F3")
+                            MDIconButton:
+                                icon: "water-plus"
+                                on_release: app.add_water(float(water_add.text))
+                                md_bg_color: get_color_from_hex("#2196F3")
+                        
+                        MDWidget:
+
+                        MDBoxLayout:
+                            orientation: "horizontal"
+                            adaptive_height: True
+                            spacing: "10dp"
+
+                            MDFillRoundFlatIconButton:
+                                icon: "cup-water"
+                                text: "100ml"
+                                on_release: app.add_water(100)
+                                md_bg_color: get_color_from_hex("#2196F3")
+                                
+                            MDFillRoundFlatIconButton:
+                                icon: "cup-water"
+                                text: "200ml"
+                                on_release: app.add_water(200)
+                                md_bg_color: get_color_from_hex("#2196F3")
+                                
+                            MDFillRoundFlatIconButton:
+                                icon: "cup-water"
+                                text: "300ml"
+                                on_release: app.add_water(300)
+                                md_bg_color: get_color_from_hex("#2196F3")
                     
                     MDBoxLayout:
                         orientation: "horizontal"
@@ -241,84 +281,40 @@ ScreenManager:
                         adaptive_height: True
                         pos_hint: {"center_x": .5}
                         
-                        MDRaisedButton:
+                        MDFillRoundFlatIconButton:
+                            icon: "cup-water"
                             text: "500ml"
                             on_release: app.add_water(500)
                             md_bg_color: get_color_from_hex("#4CAF50")
 '''
 
-class DateField(MDTextField):
-    formatted_date = StringProperty('')
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.on_text_validate = self.filter_date
-        self.validator = 'date'
-        self.date_format = 'dd/mm/yyyy'
-        self._previous_value = ''
-        
-    def filter_date(self, *args):
-        print(args)
-        # Remove qualquer caractere não numérico
-        numbers = ''.join(filter(str.isdigit, self.text))
-
-        if len(numbers) > 8:
-            numbers = numbers[:8]
-
-        # Formata a data conforme digita
-        formatted = ''
-        if len(numbers) > 0:
-            formatted = numbers[:2]
-        if len(numbers) > 2:
-            formatted += '/' + numbers[2:4]
-        if len(numbers) > 4:
-            formatted += '/' + numbers[4:8]
-
-        # Atualiza o texto do campo apenas se houver mudança
-        if formatted != self._previous_value:
-            self._previous_value = formatted
-            self.text = formatted  # Atualiza o texto diretamente
-            self.formatted_date = formatted  # Sincroniza a data formatada
-
-        # Retorna vazio pois a atualização já foi feita diretamente
-        return ''
-
-    
-    def update_text(self, formatted_text):
-        self.text = formatted_text
-        self.formatted_date = formatted_text
-        
-    def get_date(self):
-        """Converte a data formatada para objeto datetime"""
-        try:
-            if 8<= len(self.formatted_date) < 11:  # Formato completo DD/MM/YYYY
-                return datetime.strptime(self.formatted_date, '%d/%m/%Y')
-            return None
-        except ValueError:
-            return None
-
 # Screens
 class LoginScreen(MDScreen):
     pass
 
+
 class CreateProfileScreen(MDScreen):
     pass
+
 
 class TrackerScreen(MDScreen):
     pass
 
+
 class SettingsScreen(MDScreen):
     pass
+
 
 class HidrataTrackApp(MDApp):
     def build(self):
         self.user = None  # Placeholder for user data
         self.daily_goal = 0
         self.progress = 0
+        self.current_intake = 0
 
         self.sm = Builder.load_string(KV)
         return self.sm
-    
+
     def authenticate_user(self):
         login = self.sm.get_screen("login").ids.login.text
         password = self.sm.get_screen("login").ids.password.text
@@ -339,14 +335,15 @@ class HidrataTrackApp(MDApp):
         user_name = self.sm.get_screen("create_profile").ids.name.text
         birth_date_field = self.sm.get_screen("create_profile").ids.birth_date
         user_weight = self.sm.get_screen("create_profile").ids.weight.text
-        gender = self.sm.get_screen("create_profile").ids.gender_select.current_active_segment.text
+        gender = self.sm.get_screen(
+            "create_profile").ids.gender_select.current_active_segment.text
 
         # Validação da data
         birth_date = birth_date_field.get_date()
         if not birth_date:
             self.show_snackbar("Data de nascimento inválida")
             return
-        
+
         if not user_name or not user_weight:
             print("Por favor, preencha todos os campos.")
             return
@@ -360,7 +357,7 @@ class HidrataTrackApp(MDApp):
         }
         print(user)
         # Profile(nome, genero, data_nascimento, peso, detalhes)
-        self.user.set_profile(user["nome"], user['peso'])
+        self.user.set_profile(user)
         self.daily_goal = self.user.profile.daily_goal
         if self.user.profile is not None:
             print(f"Perfil criado: {self.user}")
@@ -376,7 +373,8 @@ class HidrataTrackApp(MDApp):
             return
 
         tracker_screen = self.sm.get_screen("tracker")
-        tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {Decimal(self.daily_goal).quantize(Decimal('1.'), rounding=ROUND_UP)} mL"
+        tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {
+            Decimal(self.daily_goal).quantize(Decimal('1.'), rounding=ROUND_UP)} mL"
         tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} mL"
         self.water_tracker = WaterTracker(self.user)
         self.sm.current = "tracker"
@@ -384,9 +382,12 @@ class HidrataTrackApp(MDApp):
     def add_water(self, amount):
         """Add water to the progress and update the tracker screen."""
         self.water_tracker.add_water(amount)
-        self.progress = self.water_tracker.current_intake
+        self.current_intake = self.water_tracker.current_intake
+        self.progress = self.water_tracker.get_progress()
         tracker_screen = self.sm.get_screen("tracker")
-        tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} mL"
+        tracker_screen.ids.progress_label.text = f"Progresso: {self.current_intake} mL"
+        tracker_screen.ids.water_add.text = ""
+        tracker_screen.ids.progress_bar.value = self.progress
 
     def switch_to_profile(self):
         """Switch to the profile screen."""
@@ -402,15 +403,17 @@ class HidrataTrackApp(MDApp):
 
         self.user["weight"] = float(new_weight)
         self.daily_goal = (float(new_weight) / 20) * 1000
-        print(f"Peso atualizado: {self.user['weight']} kg, Nova meta: {self.daily_goal} ml")
+        print(f"Peso atualizado: {self.user['weight']} kg, Nova meta: {
+              self.daily_goal} ml")
         self.sm.current = "menu"
-    
+
     def on_gender_select(self, segmentedcontrol, segmentedcontrolitem):
         self.selected_gender = segmentedcontrolitem.text
         self.show_snackbar(f"Gênero selecionado: {self.selected_gender}")
 
     def show_snackbar(self, msg):
         print(msg)
+
 
 if __name__ == "__main__":
     HidrataTrackApp().run()
