@@ -1,9 +1,12 @@
-from datetime import datetime
+from kivymd.uix.segmentedbutton import MDSegmentedButton
+from datetime import date, datetime
 from decimal import ROUND_UP, Decimal
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
+from kivy.metrics import dp
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
 from kivymd.uix.button import MDButton, MDButtonIcon, MDButtonText
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.label import MDLabel
@@ -14,7 +17,7 @@ from kivy.clock import Clock
 
 from user import User
 from water_tracker import WaterTracker
-from datefield import DateField
+from kivymd.uix.pickers import MDDockedDatePicker
 
 
 #KivyMD Builder String for Layout
@@ -25,11 +28,11 @@ KV = '''
 
 ScreenManager:
     transition: FadeTransition()
+    LoginScreen:
     TrackerScreen:
     CreateProfileScreen:
-    LoginScreen:
-    
-#     SettingsScreen:
+    SettingsScreen:
+#     
 # 
 <LoginScreen>:
     name: "login"
@@ -45,17 +48,30 @@ ScreenManager:
                 padding: "20dp"
                 spacing: "20dp"
                 elevation: 3
+                adaptive_height: True
 # 
                 MDBoxLayout:
                     orientation: "vertical"
                     spacing: "20dp"
                     adaptive_height: True
 
+                    MDAnchorLayout:
+                        size_hint: 1, None
+                        height: "120dp"  # Ajuste este valor conforme necessário
+                        padding: "10dp"
+                        
+                        FitImage:
+                            source: "hidratatrack.png"
+                            size_hint: None, None
+                            size: "120dp", "120dp"  # Ajuste este valor conforme necessário
+                            pos_hint: {"center_x": .5, "center_y": .5}
+
                     MDLabel:
                         text: "Bem-vindo"
                         halign: "center"
                         theme_text_color: "Primary"
-                        font_style: "Body"
+                        font_style: "Display"
+                        role: "small"
                         adaptive_height: True
 # 
                     MDTextField:
@@ -153,11 +169,16 @@ ScreenManager:
 # 
                     MDSegmentedButton:
                         id: gender_select
+                        type: "normal"
+                        adaptive_height: True
+                        radius: 45
                         pos_hint: {"center_x": .5, "center_y": .5}
 
                         MDSegmentedButtonItem:
                             id: male
                             # on_active: app.on_gender_select(*args)
+                            MDSegmentButtonIcon:
+                                icon: ""
                             MDSegmentButtonLabel:
                                 text: "Masculino"
 
@@ -182,18 +203,22 @@ ScreenManager:
                         MDTextFieldTrailingIcon:
                             icon: "account"
 # 
-#                     DateField:
-#                         id: birth_date
-#                         size_hint_y: None
-#                         height: self.minimum_height
-#                         write_tab: False
-#                         MDTextFieldHintText:
-#                             text:  "Data de Nascimento"
-#                         MDTextFieldHelperText:
-#                             text: "dd/mm/YYYY"
-#                             mode: "persistent"
-#                         MDTextFieldTrailingIcon:
-#                             icon: "calendar"
+                    MDTextField:
+                        id: birth_date
+                        mode: "outlined"
+                        size_hint_x: None
+                        width: "240dp"
+                        pos_hint: {"center_x": .5, "center_y": .5}
+                        write_tab: False
+                        readonly: True  # Importante para evitar edição manual
+                        on_focus: app.show_date_picker(self.focus)  # Chama 
+
+                        MDTextFieldHintText:
+                            text: "Data de Nascimento"
+                        MDTextFieldHelperText:
+                            text: "Clique para selecionar a data"
+                        MDTextFieldTrailingIcon:
+                            icon: "calendar"
 # 
                     MDTextField:
                         id: weight
@@ -213,7 +238,6 @@ ScreenManager:
 
                     MDTextField:
                         id: details
-                        multiline: True
                         mode: "outlined"
                         size_hint_x: None
                         width: "240dp"
@@ -223,6 +247,8 @@ ScreenManager:
 
                         MDTextFieldHintText:
                             text: "Detalhes adicionais"
+                        MDTextFieldHelperText:
+                            text: "Digite informações sobre sua saúde"
 
                     MDButton:
                         style: "filled"
@@ -318,61 +344,61 @@ ScreenManager:
                             MDIconButton:
                                 style: "standard"
                                 icon: "water-plus"
-                                on_release: app.add_water(float(water_add.text))
+                                on_release: app.add_water(water_add.text)
                                 md_bg_color: get_color_from_hex("#2196F3")
 
                         MDWidget:
 # 
-#                         MDBoxLayout:
-#                             orientation: "horizontal"
-#                             adaptive_height: True
-#                             spacing: "10dp"
+                        MDBoxLayout:
+                            orientation: "horizontal"
+                            adaptive_height: True
+                            spacing: "10dp"
+
+                            MDButton:
+                                style: "filled"
+                                on_release: app.add_water(100)
+                                md_bg_color: get_color_from_hex("#2196F3")
+
+                                MDButtonIcon:
+                                    icon: "cup-water"
+                                MDButtonText:
+                                    text: "100mL"
+
+                            MDButton:
+                                style: "filled"
+                                on_release: app.add_water(200)
+                                md_bg_color: get_color_from_hex("#2196F3")
+
+                                MDButtonIcon:
+                                    icon: "cup-water"
+                                MDButtonText:
+                                    text: "200mL"
 # 
-#                             MDButton:
-#                                 style: "filled"
-#                                 on_release: app.add_water(100)
-#                                 md_bg_color: get_color_from_hex("#2196F3")
+                            MDButton:
+                                style: "filled"
+                                on_release: app.add_water(300)
+                                md_bg_color: get_color_from_hex("#2196F3")
+
+                                MDButtonIcon:
+                                    icon: "cup-water"
+                                MDButtonText:
+                                    text: "300mL"
 # 
-#                                 MDButtonIcon:
-#                                     icon: "cup-water"
-#                                 MDButtonText:
-#                                     text: "100mL"
-# 
-#                             MDButton:
-#                                 style: "filled"
-#                                 on_release: app.add_water(200)
-#                                 md_bg_color: get_color_from_hex("#2196F3")
-# 
-#                                 MDButtonIcon:
-#                                     icon: "cup-water"
-#                                 MDButtonText:
-#                                     text: "200mL"
-# 
-#                             MDButton:
-#                                 style: "filled"
-#                                 on_release: app.add_water(300)
-#                                 md_bg_color: get_color_from_hex("#2196F3")
-# 
-#                                 MDButtonIcon:
-#                                     icon: "cup-water"
-#                                 MDButtonText:
-#                                     text: "300mL"
-# 
-#                     MDBoxLayout:
-#                         orientation: "horizontal"
-#                         spacing: "10dp"
-#                         adaptive_height: True
-#                         pos_hint: {"center_x": .5}
-# 
-#                         MDButton:
-#                             style: "filled"
-#                             on_release: app.add_water(500)
-#                             md_bg_color: get_color_from_hex("#4CAF50")
-# 
-#                             MDButtonIcon:
-#                                 icon: "cup-water"
-#                             MDButtonText:
-#                                 text: "500mL"
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        spacing: "10dp"
+                        adaptive_height: True
+                        pos_hint: {"center_x": .5}
+
+                        MDButton:
+                            style: "filled"
+                            on_release: app.add_water(500)
+                            md_bg_color: get_color_from_hex("#4CAF50")
+
+                            MDButtonIcon:
+                                icon: "cup-water"
+                            MDButtonText:
+                                text: "500mL"
 
 '''
 
@@ -399,10 +425,9 @@ class HidrataTrackApp(MDApp):
         # self.daily_goal = 0
         # self.progress = 0
         # self.current_intake = 0
-        # self.set_bars_colors()
+        self.set_bars_colors()
         self.sm = Builder.load_string(KV)
         return self.sm
-        # return MDLabel(text="Hello, World")
 
     def set_bars_colors(self):
         set_bars_colors(
@@ -418,30 +443,37 @@ class HidrataTrackApp(MDApp):
         # Placeholder for authentication logic
         if login == "test" and password == "1234":
             self.user = User(login, password)
-            print("Usuário autenticado com sucesso!")
             if self.user.profile is None:
                 self.switch_to_profile()
             else:
                 self.switch_to_tracker()
         else:
-            print("Login ou senha inválidos.")
+            self.show_snackbar("Login ou senha inválidos.")
 
     def create_profile(self):
         """Create a user profile and calculate the daily water goal."""
+        self.sm.get_screen("create_profile").ids.gender_select.adjust_segment_radius(15)
         user_name = self.sm.get_screen("create_profile").ids.name.text
         birth_date_field = self.sm.get_screen("create_profile").ids.birth_date
         user_weight = self.sm.get_screen("create_profile").ids.weight.text
-        gender = self.sm.get_screen(
-            "create_profile").ids.gender_select.current_active_segment.text
+        try:
+            gender_selector: MDSegmentedButton = self.sm.get_screen("create_profile").ids.gender_select
+            gender = gender_selector.get_marked_items()[0]._label.text
+        except IndexError:
+            force_selected = gender_selector.get_items()[0]
+            gender_selector.mark_item(force_selected)
+            gender =gender_selector.get_marked_items()[0]._label.text
 
         # Validação da data
-        birth_date = birth_date_field.get_date()
+        birth_date = birth_date_field.text
         if not birth_date:
             self.show_snackbar("Data de nascimento inválida")
             return
+        else:
+            birth_date = datetime.strptime(self.formatted_date, '%d/%m/%Y')
 
-        if not user_name or not user_weight:
-            print("Por favor, preencha todos os campos.")
+        if not all([user_name, user_weight, gender, birth_date]):
+            self.show_snackbar("Por favor, preencha todos os campos.")
             return
 
         user = {
@@ -451,13 +483,53 @@ class HidrataTrackApp(MDApp):
             "genero": gender,
             "detalhes": []
         }
-        print(user)
         # Profile(nome, genero, data_nascimento, peso, detalhes)
         self.user.set_profile(user)
         self.daily_goal = self.user.profile.daily_goal
         if self.user.profile is not None:
             print(f"Perfil criado: {self.user}")
             self.switch_to_tracker()
+
+    def show_date_picker(self, focus):
+        if not focus:
+            return
+        
+        date_dialog = MDDockedDatePicker(
+            theme_bg_color="Custom",  # Cor principal do calendário
+            scrim_color=(1,1,1,0), # Cor do texto dos botões
+            theme_text_color="Secondary", # Cor da data atual
+            supporting_text="Selecione a data"
+            )
+        date_dialog.bind(
+            on_ok=self.on_ok,
+            on_select_day=self.on_select_day,
+            on_cancel=self.on_cancel_date
+            )
+        date_dialog.open()
+
+    def on_ok(self, instance_date_picker):
+        date = instance_date_picker.get_date()[0]
+        birth_date_field = self.root.get_screen('create_profile').ids.birth_date
+        self.set_date_field(instance_date_picker, date, birth_date_field)
+
+    def set_date_field(self, instance_date_picker, date, birth_date_field):
+        birth_date_field.text = date.strftime('%d/%m/%Y')
+        instance_date_picker.dismiss()
+
+    def on_select_day(self, instance, value):
+        """
+        Esta função será chamada quando uma data for selecionada
+        """
+        #pegar o mes e o ano para assim gerar uma data
+        birth_date_field = self.root.get_screen('create_profile').ids.birth_date
+        data = date(instance.sel_year, instance.sel_month, value)
+        self.set_date_field(instance, data, birth_date_field)
+
+    def on_cancel_date(self, instance):
+        """
+        Esta função será chamada quando o usuário cancelar a seleção
+        """
+        instance.dismiss()
 
     def switch_to_create_account(self):
         ...
@@ -477,7 +549,12 @@ class HidrataTrackApp(MDApp):
 
     def add_water(self, amount):
         """Add water to the progress and update the tracker screen."""
-        self.water_tracker.add_water(amount)
+        if not getattr(self, self.water_tracker):
+            self.water_tracker = WaterTracker(self.user)
+        if amount is not None:
+            self.water_tracker.add_water(float(amount))
+        else:
+            return "O campo está vazio!"
         self.current_intake = self.water_tracker.current_intake
         self.progress = self.water_tracker.get_progress()
         tracker_screen = self.sm.get_screen("tracker")
@@ -499,8 +576,6 @@ class HidrataTrackApp(MDApp):
 
         self.user["weight"] = float(new_weight)
         self.daily_goal = (float(new_weight) / 20) * 1000
-        print(f"Peso atualizado: {self.user['weight']} kg, Nova meta: {
-        self.daily_goal} ml")
         self.sm.current = "menu"
 
     def on_gender_select(self, segmentedcontrol, segmentedcontrolitem):
@@ -508,7 +583,12 @@ class HidrataTrackApp(MDApp):
         self.show_snackbar(f"Gênero selecionado: {self.selected_gender}")
 
     def show_snackbar(self, msg):
-        print(msg)
+        MDSnackbar(
+            MDSnackbarText(text=msg,),
+            y=dp(24),
+            pos_hint={"center_x": 0.5},
+            size_hint_x=0.5,
+        ).open()
 
 
 if __name__ == "__main__":
