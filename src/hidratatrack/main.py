@@ -8,6 +8,7 @@ from kivymd.uix.button import MDButton, MDButtonIcon, MDButtonText
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.utils.set_bars_colors import set_bars_colors
 
 from kivy.clock import Clock
 
@@ -15,7 +16,8 @@ from user import User
 from water_tracker import WaterTracker
 from datefield import DateField
 
-# KivyMD Builder String for Layout
+
+#KivyMD Builder String for Layout
 KV = '''
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
@@ -23,36 +25,18 @@ KV = '''
 
 ScreenManager:
     transition: FadeTransition()
-    LoginScreen:
-    CreateProfileScreen:
     TrackerScreen:
-    SettingsScreen:
-
+    CreateProfileScreen:
+    LoginScreen:
+    
+#     SettingsScreen:
+# 
 <LoginScreen>:
     name: "login"
-
+# 
     MDBoxLayout:
         orientation: "vertical"
-
-        MDTopAppBar:
-            type: "small"
-            size_hint_x: .8
-            pos_hint: {"center_x": .5, "center_y": .5}
-
-            MDTopAppBarLeadingButtonContainer:
-
-                MDActionTopAppBarButton:
-                    icon: "menu"
-
-            MDTopAppBarTitle:
-                text: "HidrataTrack"
-                pos_hint: {"center_x": .5}
-
-            MDTopAppBarTrailingButtonContainer:
-
-                MDActionTopAppBarButton:
-                    icon: "account-circle-outline"
-        
+# 
         MDFloatLayout:
             MDCard:
                 size_hint: None, None
@@ -61,19 +45,19 @@ ScreenManager:
                 padding: "20dp"
                 spacing: "20dp"
                 elevation: 3
-                
+# 
                 MDBoxLayout:
                     orientation: "vertical"
                     spacing: "20dp"
                     adaptive_height: True
-                    
+
                     MDLabel:
                         text: "Bem-vindo"
                         halign: "center"
                         theme_text_color: "Primary"
                         font_style: "Body"
                         adaptive_height: True
-                        
+# 
                     MDTextField:
                         id: login
                         mode: "outlined"
@@ -81,7 +65,7 @@ ScreenManager:
                         width: "240dp"
                         pos_hint: {"center_x": .5, "center_y": .5}
                         write_tab: False
-                        
+
                         MDTextFieldLeadingIcon:
                             icon: "account"
 
@@ -89,8 +73,7 @@ ScreenManager:
                             text: "Login"
                         MDTextFieldHelperText:
                             text: "Digite seu nome de usuário"
-                    
-                        
+# 
                     MDTextField:
                         id: password
                         mode: "outlined"
@@ -104,12 +87,10 @@ ScreenManager:
                             text: "Senha"
                         MDTextFieldHelperText:
                             text: "Digite sua senha"
-                        
+
                         MDTextFieldLeadingIcon:
                             icon: "key-variant"
-                        
-                        
-                        
+# 
                     MDButton:
                         style: "filled"
                         pos_hint: {"center_x": .5}
@@ -118,7 +99,7 @@ ScreenManager:
                         on_release: app.authenticate_user()
                         MDButtonText:
                             text: "Entrar"
-                        
+# 
                     MDButton:
                         style: "filled"
                         pos_hint: {"center_x": .5}
@@ -127,16 +108,16 @@ ScreenManager:
                         on_release: app.switch_to_create_account()
                         MDButtonText:
                             text: "Criar Conta"
-
+# 
 <CreateProfileScreen>:
     name: "create_profile"
-    
+
     MDBoxLayout:
         orientation: "vertical"
-        
+# 
         MDTopAppBar:
             type: "small"
-
+# 
             MDTopAppBarLeadingButtonContainer:
 
                 MDActionTopAppBarButton:
@@ -145,12 +126,12 @@ ScreenManager:
             MDTopAppBarTitle:
                 text: "Criar Perfil"
                 pos_hint: {"center_x": .5}
-
-            MDTopAppBarTrailingButtonContainer:
-
-                MDActionTopAppBarButton:
-                    icon: "account-circle-outline"
-            
+# 
+#             MDTopAppBarTrailingButtonContainer:
+# 
+#                 MDActionTopAppBarButton:
+#                     icon: "account-circle-outline"
+# 
         MDFloatLayout:
             MDCard:
                 size_hint: None, None
@@ -159,30 +140,32 @@ ScreenManager:
                 padding: "20dp"
                 spacing: "20dp"
                 elevation: 3
-                
+# 
                 MDBoxLayout:
                     orientation: "vertical"
                     spacing: "20dp"
-                    
+
                     MDLabel:
                         text: "Informações Pessoais"
                         halign: "center"
                         theme_text_color: "Primary"
-                        font_style: "H5"
-                    
+                        font_style: "Title"
+# 
                     MDSegmentedButton:
                         id: gender_select
                         pos_hint: {"center_x": .5, "center_y": .5}
-                        on_active: app.on_gender_select(*args)
-                        
+
                         MDSegmentedButtonItem:
                             id: male
-                            text: "Masculino"
-                            
+                            # on_active: app.on_gender_select(*args)
+                            MDSegmentButtonLabel:
+                                text: "Masculino"
+
                         MDSegmentedButtonItem:
                             id: female
-                            text: "Feminino"
-
+                            MDSegmentButtonLabel:
+                                text: "Feminino"
+# 
                     MDTextField:
                         id: name
                         mode: "outlined"
@@ -195,23 +178,23 @@ ScreenManager:
                             text: "Nome"
                         MDTextFieldHelperText:
                             text: "Digite seu nome completo"
-                        
+
                         MDTextFieldTrailingIcon:
                             icon: "account"
-                        
-                    DateField:
-                        id: birth_date
-                        size_hint_y: None
-                        height: self.minimum_height
-                        write_tab: False
-                        MDTextFieldHintText:
-                            text:  "Data de Nascimento"
-                        MDTextFieldHelperText:
-                            text: "dd/mm/YYYY"
-                            mode: "persistent"
-                        MDTextFieldTrailingIcon:
-                            icon: "calendar"
-                        
+# 
+#                     DateField:
+#                         id: birth_date
+#                         size_hint_y: None
+#                         height: self.minimum_height
+#                         write_tab: False
+#                         MDTextFieldHintText:
+#                             text:  "Data de Nascimento"
+#                         MDTextFieldHelperText:
+#                             text: "dd/mm/YYYY"
+#                             mode: "persistent"
+#                         MDTextFieldTrailingIcon:
+#                             icon: "calendar"
+# 
                     MDTextField:
                         id: weight
                         mode: "outlined"
@@ -227,7 +210,7 @@ ScreenManager:
                             text: "Digite seu peso em quilogramas"
                         MDTextFieldTrailingIcon:
                             icon: "weight-kilogram"
-                        
+
                     MDTextField:
                         id: details
                         multiline: True
@@ -240,7 +223,7 @@ ScreenManager:
 
                         MDTextFieldHintText:
                             text: "Detalhes adicionais"
-                       
+
                     MDButton:
                         style: "filled"
                         pos_hint: {"center_x": .5}
@@ -249,13 +232,13 @@ ScreenManager:
                         on_release: app.create_profile()
                         MDButtonText:
                             text: "Salvar Perfil"
-
+# 
 <TrackerScreen>:
     name: "tracker"
-    
+
     MDBoxLayout:
         orientation: "vertical"
-        
+
         MDTopAppBar:
             type: "small"
 
@@ -267,12 +250,12 @@ ScreenManager:
             MDTopAppBarTitle:
                 text: "Controle Diário"
                 pos_hint: {"center_x": .5}
-
-            MDTopAppBarTrailingButtonContainer:
-
-                MDActionTopAppBarButton:
-                    icon: "account-circle-outline"
-            
+# 
+#             MDTopAppBarTrailingButtonContainer:
+# 
+#                 MDActionTopAppBarButton:
+#                     icon: "account-circle-outline"
+# 
         MDFloatLayout:
             MDCard:
                 size_hint: None, None
@@ -281,37 +264,38 @@ ScreenManager:
                 padding: "20dp"
                 spacing: "20dp"
                 elevation: 3
-                
+
                 MDBoxLayout:
                     orientation: "vertical"
                     spacing: "20dp"
-                    
+
                     MDLabel:
                         id: daily_goal_label
                         text: "Meta Diária: 0 mL"
                         halign: "center"
                         theme_text_color: "Primary"
-                        font_style: "H6"
-                        
+                        font_style: "Title"
+                        role: "large"
+# 
                     MDLabel:
                         id: progress_label
                         text: "Progresso: 0 mL"
                         halign: "center"
                         theme_text_color: "Secondary"
-                        
+
                     MDLinearProgressIndicator:
                         id: progress_bar
                         value: 0
                         color: get_color_from_hex("#2196F3")
                         size_hint_x: .9
                         pos_hint: {"center_x": .5}
-                        
+# 
                     MDBoxLayout:
                         orientation: "vertical"
                         spacing: "10dp"
                         adaptive_height: True
                         pos_hint: {"center_x": .5}
-                        
+
                         MDBoxLayout:
                             orientation: "horizontal"
                             adaptive_height: True
@@ -325,74 +309,74 @@ ScreenManager:
                                 pos_hint: {"center_x": .5, "center_y": .5}
                                 input_filter: "float"
                                 write_tab: False
-
+# 
                                 MDTextFieldHintText:
                                     text: "Volume bebido."
                                 MDTextFieldHelperText:
                                     text: "Digite o volume em mL"
-                            
+# 
                             MDIconButton:
                                 style: "standard"
                                 icon: "water-plus"
                                 on_release: app.add_water(float(water_add.text))
                                 md_bg_color: get_color_from_hex("#2196F3")
-                        
+
                         MDWidget:
+# 
+#                         MDBoxLayout:
+#                             orientation: "horizontal"
+#                             adaptive_height: True
+#                             spacing: "10dp"
+# 
+#                             MDButton:
+#                                 style: "filled"
+#                                 on_release: app.add_water(100)
+#                                 md_bg_color: get_color_from_hex("#2196F3")
+# 
+#                                 MDButtonIcon:
+#                                     icon: "cup-water"
+#                                 MDButtonText:
+#                                     text: "100mL"
+# 
+#                             MDButton:
+#                                 style: "filled"
+#                                 on_release: app.add_water(200)
+#                                 md_bg_color: get_color_from_hex("#2196F3")
+# 
+#                                 MDButtonIcon:
+#                                     icon: "cup-water"
+#                                 MDButtonText:
+#                                     text: "200mL"
+# 
+#                             MDButton:
+#                                 style: "filled"
+#                                 on_release: app.add_water(300)
+#                                 md_bg_color: get_color_from_hex("#2196F3")
+# 
+#                                 MDButtonIcon:
+#                                     icon: "cup-water"
+#                                 MDButtonText:
+#                                     text: "300mL"
+# 
+#                     MDBoxLayout:
+#                         orientation: "horizontal"
+#                         spacing: "10dp"
+#                         adaptive_height: True
+#                         pos_hint: {"center_x": .5}
+# 
+#                         MDButton:
+#                             style: "filled"
+#                             on_release: app.add_water(500)
+#                             md_bg_color: get_color_from_hex("#4CAF50")
+# 
+#                             MDButtonIcon:
+#                                 icon: "cup-water"
+#                             MDButtonText:
+#                                 text: "500mL"
 
-                        MDBoxLayout:
-                            orientation: "horizontal"
-                            adaptive_height: True
-                            spacing: "10dp"
-
-                            MDButton:
-                                style: "filled"
-                                on_release: app.add_water(100)
-                                md_bg_color: get_color_from_hex("#2196F3")
-
-                                MDButtonIcon:
-                                    icon: "cup-water"
-                                MDButtonText:
-                                    text: "100mL"
-                                
-                            MDButton:
-                                style: "filled"
-                                on_release: app.add_water(200)
-                                md_bg_color: get_color_from_hex("#2196F3")
-
-                                MDButtonIcon:
-                                    icon: "cup-water"
-                                MDButtonText:
-                                    text: "200mL"
-                                
-                            MDButton:
-                                style: "filled"
-                                on_release: app.add_water(300)
-                                md_bg_color: get_color_from_hex("#2196F3")
-
-                                MDButtonIcon:
-                                    icon: "cup-water"
-                                MDButtonText:
-                                    text: "300mL"
-                    
-                    MDBoxLayout:
-                        orientation: "horizontal"
-                        spacing: "10dp"
-                        adaptive_height: True
-                        pos_hint: {"center_x": .5}
-                        
-                        MDButton:
-                            style: "filled"
-                            on_release: app.add_water(500)
-                            md_bg_color: get_color_from_hex("#4CAF50")
-                                
-                            MDButtonIcon:
-                                icon: "cup-water"
-                            MDButtonText:
-                                text: "500mL"
-                            
 '''
 
-# Screens
+#Screens
 class LoginScreen(MDScreen):
     pass
 
@@ -408,23 +392,23 @@ class TrackerScreen(MDScreen):
 class SettingsScreen(MDScreen):
     pass
 
-from kivymd.utils.set_bars_colors import set_bars_colors
 
 class HidrataTrackApp(MDApp):
     def build(self):
-        self.user = None  # Placeholder for user data
-        self.daily_goal = 0
-        self.progress = 0
-        self.current_intake = 0
-        self.set_bars_colors()
+        # self.user = None  # Placeholder for user data
+        # self.daily_goal = 0
+        # self.progress = 0
+        # self.current_intake = 0
+        # self.set_bars_colors()
         self.sm = Builder.load_string(KV)
         return self.sm
-    
+        # return MDLabel(text="Hello, World")
+
     def set_bars_colors(self):
         set_bars_colors(
             self.theme_cls.primary_palette,  # status bar color
             self.theme_cls.primary_palette,  # navigation bar color
-            "Light",                       # icons color of status bar
+            "Light",  # icons color of status bar
         )
 
     def authenticate_user(self):
@@ -486,7 +470,7 @@ class HidrataTrackApp(MDApp):
 
         tracker_screen = self.sm.get_screen("tracker")
         tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {
-            Decimal(self.daily_goal).quantize(Decimal('1.'), rounding=ROUND_UP)} mL"
+        Decimal(self.daily_goal).quantize(Decimal('1.'), rounding=ROUND_UP)} mL"
         tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} mL"
         self.water_tracker = WaterTracker(self.user)
         self.sm.current = "tracker"
@@ -516,7 +500,7 @@ class HidrataTrackApp(MDApp):
         self.user["weight"] = float(new_weight)
         self.daily_goal = (float(new_weight) / 20) * 1000
         print(f"Peso atualizado: {self.user['weight']} kg, Nova meta: {
-              self.daily_goal} ml")
+        self.daily_goal} ml")
         self.sm.current = "menu"
 
     def on_gender_select(self, segmentedcontrol, segmentedcontrolitem):
