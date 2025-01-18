@@ -1,25 +1,19 @@
-from kivymd.uix.segmentedbutton import MDSegmentedButton
 from datetime import date, datetime
 from decimal import ROUND_UP, Decimal
+
 from kivy.lang import Builder
-from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 from kivy.metrics import dp
 from kivymd.app import MDApp
+from kivymd.uix.pickers import MDDockedDatePicker
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.segmentedbutton import MDSegmentedButton
 from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
-from kivymd.uix.button import MDButton, MDButtonIcon, MDButtonText
-from kivymd.uix.textfield import MDTextField
-from kivymd.uix.label import MDLabel
-from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.utils.set_bars_colors import set_bars_colors
-
-from kivy.clock import Clock
 
 from user import User
 from water_tracker import WaterTracker
-from kivymd.uix.pickers import MDDockedDatePicker
 
-#KivyMD Builder String for Layout
+# KivyMD Builder String for Layout
 KV = '''
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
@@ -56,13 +50,13 @@ ScreenManager:
 
                     MDAnchorLayout:
                         size_hint: 1, None
-                        height: "120dp"  # Ajuste este valor conforme necessário
+                        height: "120dp" 
                         padding: "10dp"
                         
                         FitImage:
                             source: "hidratatrack.png"
                             size_hint: None, None
-                            size: "120dp", "120dp"  # Ajuste este valor conforme necessário
+                            size: "120dp", "120dp"
                             pos_hint: {"center_x": .5, "center_y": .5}
 
                     MDLabel:
@@ -402,7 +396,7 @@ ScreenManager:
 '''
 
 
-#Screens
+# Screens
 class LoginScreen(MDScreen):
     pass
 
@@ -457,9 +451,9 @@ class HidrataTrackApp(MDApp):
         user_name = self.sm.get_screen("create_profile").ids.name.text
         birth_date_field = self.sm.get_screen("create_profile").ids.birth_date
         user_weight = self.sm.get_screen("create_profile").ids.weight.text
+        gender_selector: MDSegmentedButton = self.sm.get_screen(
+            "create_profile").ids.gender_select
         try:
-            gender_selector: MDSegmentedButton = self.sm.get_screen(
-                "create_profile").ids.gender_select
             gender = gender_selector.get_marked_items()[0]._label.text
         except IndexError:
             force_selected = gender_selector.get_items()[0]
@@ -510,20 +504,20 @@ class HidrataTrackApp(MDApp):
         self.date_dialog.open()
 
     def on_ok(self, instance_date_picker):
-        date = instance_date_picker.get_date()[0]
+        data = instance_date_picker.get_date()[0]
         birth_date_field = self.root.get_screen(
             'create_profile').ids.birth_date
-        self.set_date_field(instance_date_picker, date, birth_date_field)
+        self.set_date_field(instance_date_picker, data, birth_date_field)
 
-    def set_date_field(self, instance_date_picker, date, birth_date_field):
-        birth_date_field.text = date.strftime('%d/%m/%Y')
+    def set_date_field(self, instance_date_picker, data, birth_date_field):
+        birth_date_field.text = data.strftime('%d/%m/%Y')
         instance_date_picker.dismiss()
 
     def on_select_day(self, instance, value):
         """
         Esta função será chamada quando uma data for selecionada
         """
-        #pegar o mes e o ano para assim gerar uma data
+        # pegar o mes e o ano para assim gerar uma data
         birth_date_field = self.root.get_screen(
             'create_profile').ids.birth_date
         data = date(instance.sel_year, instance.sel_month, value)
@@ -546,8 +540,8 @@ class HidrataTrackApp(MDApp):
 
         tracker_screen = self.sm.get_screen("tracker")
         tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {
-        Decimal(self.daily_goal).quantize(Decimal('1.'), rounding=ROUND_UP)} mL"
-        tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} mL"
+        Decimal(self.daily_goal).quantize(Decimal('1.'), rounding=ROUND_UP)}mL"
+        tracker_screen.ids.progress_label.text = f"Progresso: {self.progress}mL"
         self.water_tracker = WaterTracker(self.user)
         self.sm.current = "tracker"
 
@@ -562,7 +556,8 @@ class HidrataTrackApp(MDApp):
         self.current_intake = self.water_tracker.current_intake
         self.progress = self.water_tracker.get_progress()
         tracker_screen = self.sm.get_screen("tracker")
-        tracker_screen.ids.progress_label.text = f"Progresso: {self.current_intake} mL"
+        tracker_screen.ids.progress_label.text = f"Progresso: {
+        self.current_intake} mL"
         tracker_screen.ids.water_add.text = ""
         tracker_screen.ids.progress_bar.value = self.progress
 
@@ -582,9 +577,9 @@ class HidrataTrackApp(MDApp):
         self.daily_goal = (float(new_weight) / 20) * 1000
         self.sm.current = "menu"
 
-    def on_gender_select(self, segmentedcontrol, segmentedcontrolitem):
-        self.selected_gender = segmentedcontrolitem.text
-        self.show_snackbar(f"Gênero selecionado: {self.selected_gender}")
+    # def on_gender_select(self, segmentedcontrol, segmentedcontrolitem):
+    #     self.selected_gender = segmentedcontrolitem.text
+    #     self.show_snackbar(f"Gênero selecionado: {self.selected_gender}")
 
     def show_snackbar(self, msg):
         MDSnackbar(

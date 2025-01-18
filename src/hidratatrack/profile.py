@@ -5,7 +5,7 @@ class Profile:
     def __init__(self, nome, genero, data_nascimento, peso, detalhes):
         self.nome = nome
         self.genero = genero
-        self.data_nascimento = data_nascimento
+        self.birth_date = data_nascimento
         self.idade = self.get_age()
         self.peso = peso
         self.daily_goal = self.calculate_goal(self.peso)
@@ -24,9 +24,9 @@ class Profile:
     def get_age(self):
         """Calcula a idade do usuário conforme a data de nascimento."""
         today = date.today()
-        print(f'{self.data_nascimento}')
-        age = today.year - self.data_nascimento.year
-        if (today.month, today.day) < (self.data_nascimento.month, self.data_nascimento.day):
+        print(f'{self.birth_date}')
+        age = today.year - self.birth_date.year
+        if (today.month, today.day) < (self.birth_date.month, self.birth_date.day):
             age -= 1
         return age
     
@@ -41,10 +41,10 @@ class Profile:
         else:
             raise ValueError("O peso deve ser maior que zero!")
         return self.peso
-     # type: ignore
+    # type: ignore
     
-    @staticmethod
-    def create_profile(name, weight):
-        return Profile(
-            nome=name, genero="Seu genero", data_nascimento=date(1993, 1, 1), peso=weight, detalhes="Nenhum"
-            )
+    # @staticmethod
+    # def create_profile(name, weight):
+    #     return Profile(
+    #         nome=name, genero="Seu genero", data_nascimento=date(1993, 1, 1), peso=weight, detalhes="Nenhum"
+    #         )
