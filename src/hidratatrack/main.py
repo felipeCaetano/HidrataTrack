@@ -19,7 +19,6 @@ from user import User
 from water_tracker import WaterTracker
 from kivymd.uix.pickers import MDDockedDatePicker
 
-
 #KivyMD Builder String for Layout
 KV = '''
 #:import get_color_from_hex kivy.utils.get_color_from_hex
@@ -402,6 +401,7 @@ ScreenManager:
 
 '''
 
+
 #Screens
 class LoginScreen(MDScreen):
     pass
@@ -421,10 +421,10 @@ class SettingsScreen(MDScreen):
 
 class HidrataTrackApp(MDApp):
     def build(self):
-        # self.user = None  # Placeholder for user data
-        # self.daily_goal = 0
-        # self.progress = 0
-        # self.current_intake = 0
+        self.user = None  # Placeholder for user data
+        self.daily_goal = 0
+        self.progress = 0
+        self.current_intake = 0
         self.set_bars_colors()
         self.sm = Builder.load_string(KV)
         return self.sm
@@ -452,17 +452,19 @@ class HidrataTrackApp(MDApp):
 
     def create_profile(self):
         """Create a user profile and calculate the daily water goal."""
-        self.sm.get_screen("create_profile").ids.gender_select.adjust_segment_radius(15)
+        self.sm.get_screen(
+            "create_profile").ids.gender_select.adjust_segment_radius(15)
         user_name = self.sm.get_screen("create_profile").ids.name.text
         birth_date_field = self.sm.get_screen("create_profile").ids.birth_date
         user_weight = self.sm.get_screen("create_profile").ids.weight.text
         try:
-            gender_selector: MDSegmentedButton = self.sm.get_screen("create_profile").ids.gender_select
+            gender_selector: MDSegmentedButton = self.sm.get_screen(
+                "create_profile").ids.gender_select
             gender = gender_selector.get_marked_items()[0]._label.text
         except IndexError:
             force_selected = gender_selector.get_items()[0]
             gender_selector.mark_item(force_selected)
-            gender =gender_selector.get_marked_items()[0]._label.text
+            gender = gender_selector.get_marked_items()[0]._label.text
 
         # Validação da data
         birth_date = birth_date_field.text
@@ -470,16 +472,16 @@ class HidrataTrackApp(MDApp):
             self.show_snackbar("Data de nascimento inválida")
             return
         else:
-            birth_date = datetime.strptime(self.formatted_date, '%d/%m/%Y')
+            date_obj = datetime.strptime(birth_date, '%d/%m/%Y')
 
-        if not all([user_name, user_weight, gender, birth_date]):
+        if not all([user_name, user_weight, gender, date_obj]):
             self.show_snackbar("Por favor, preencha todos os campos.")
             return
 
         user = {
             "nome": user_name,
             "peso": float(user_weight),
-            "data_nascimento": birth_date,
+            "data_nascimento": date_obj,
             "genero": gender,
             "detalhes": []
         }
@@ -493,23 +495,24 @@ class HidrataTrackApp(MDApp):
     def show_date_picker(self, focus):
         if not focus:
             return
-        
-        date_dialog = MDDockedDatePicker(
+
+        self.date_dialog = MDDockedDatePicker(
             theme_bg_color="Custom",  # Cor principal do calendário
-            scrim_color=(1,1,1,0), # Cor do texto dos botões
-            theme_text_color="Secondary", # Cor da data atual
+            scrim_color=(1, 1, 1, 0),  # Cor do texto dos botões
+            theme_text_color="Secondary",  # Cor da data atual
             supporting_text="Selecione a data"
-            )
-        date_dialog.bind(
+        )
+        self.date_dialog.bind(
             on_ok=self.on_ok,
             on_select_day=self.on_select_day,
             on_cancel=self.on_cancel_date
-            )
-        date_dialog.open()
+        )
+        self.date_dialog.open()
 
     def on_ok(self, instance_date_picker):
         date = instance_date_picker.get_date()[0]
-        birth_date_field = self.root.get_screen('create_profile').ids.birth_date
+        birth_date_field = self.root.get_screen(
+            'create_profile').ids.birth_date
         self.set_date_field(instance_date_picker, date, birth_date_field)
 
     def set_date_field(self, instance_date_picker, date, birth_date_field):
@@ -521,7 +524,8 @@ class HidrataTrackApp(MDApp):
         Esta função será chamada quando uma data for selecionada
         """
         #pegar o mes e o ano para assim gerar uma data
-        birth_date_field = self.root.get_screen('create_profile').ids.birth_date
+        birth_date_field = self.root.get_screen(
+            'create_profile').ids.birth_date
         data = date(instance.sel_year, instance.sel_month, value)
         self.set_date_field(instance, data, birth_date_field)
 
@@ -549,7 +553,7 @@ class HidrataTrackApp(MDApp):
 
     def add_water(self, amount):
         """Add water to the progress and update the tracker screen."""
-        if not getattr(self, self.water_tracker):
+        if not getattr(self, 'water_tracker'):
             self.water_tracker = WaterTracker(self.user)
         if amount is not None:
             self.water_tracker.add_water(float(amount))
@@ -584,7 +588,7 @@ class HidrataTrackApp(MDApp):
 
     def show_snackbar(self, msg):
         MDSnackbar(
-            MDSnackbarText(text=msg,),
+            MDSnackbarText(text=msg, ),
             y=dp(24),
             pos_hint={"center_x": 0.5},
             size_hint_x=0.5,

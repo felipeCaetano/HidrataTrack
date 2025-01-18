@@ -24,7 +24,7 @@ class Profile:
     def get_age(self):
         """Calcula a idade do usuário conforme a data de nascimento."""
         today = date.today()
-
+        print(f'{self.data_nascimento}')
         age = today.year - self.data_nascimento.year
         if (today.month, today.day) < (self.data_nascimento.month, self.data_nascimento.day):
             age -= 1

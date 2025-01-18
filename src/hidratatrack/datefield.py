@@ -47,7 +47,7 @@ class DateField(MDTextField):
     def get_date(self):
         """Converte a data formatada para objeto datetime"""
         try:
-            if 8<= len(self.formatted_date) < 11:  # Formato completo DD/MM/YYYY
+            if 8 <= len(self.formatted_date) < 11:  # Formato completo DD/MM/YYYY
                 return datetime.strptime(self.formatted_date, '%d/%m/%Y')
             return None
         except ValueError:
