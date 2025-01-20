@@ -1,6 +1,8 @@
-from kivymd.uix.segmentedbutton import MDSegmentedButton
 from datetime import date, datetime
 from decimal import ROUND_UP, Decimal
+
+from kivy.core.window import Window
+from kivymd.uix.segmentedbutton import MDSegmentedButton
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 from kivy.metrics import dp
@@ -12,422 +14,47 @@ from kivymd.uix.textfield import MDTextField
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.utils.set_bars_colors import set_bars_colors
+from kivymd.uix.pickers import MDDockedDatePicker
 
 from kivy.clock import Clock
 
-from user import User
-from water_tracker import WaterTracker
-from kivymd.uix.pickers import MDDockedDatePicker
-
-#KivyMD Builder String for Layout
-KV = '''
-#:import get_color_from_hex kivy.utils.get_color_from_hex
-#:import FadeTransition kivy.uix.screenmanager.FadeTransition
-#:import DateField datefield
-
-ScreenManager:
-    transition: FadeTransition()
-    LoginScreen:
-    TrackerScreen:
-    CreateProfileScreen:
-    SettingsScreen:
-#     
-# 
-<LoginScreen>:
-    name: "login"
-# 
-    MDBoxLayout:
-        orientation: "vertical"
-# 
-        MDFloatLayout:
-            MDCard:
-                size_hint: None, None
-                size: "300dp", "400dp"
-                pos_hint: {"center_x": .5, "center_y": .5}
-                padding: "20dp"
-                spacing: "20dp"
-                elevation: 3
-                adaptive_height: True
-# 
-                MDBoxLayout:
-                    orientation: "vertical"
-                    spacing: "20dp"
-                    adaptive_height: True
-
-                    MDAnchorLayout:
-                        size_hint: 1, None
-                        height: "120dp"  # Ajuste este valor conforme necessário
-                        padding: "10dp"
-                        
-                        FitImage:
-                            source: "hidratatrack.png"
-                            size_hint: None, None
-                            size: "120dp", "120dp"  # Ajuste este valor conforme necessário
-                            pos_hint: {"center_x": .5, "center_y": .5}
-
-                    MDLabel:
-                        text: "Bem-vindo"
-                        halign: "center"
-                        theme_text_color: "Primary"
-                        font_style: "Display"
-                        role: "small"
-                        adaptive_height: True
-# 
-                    MDTextField:
-                        id: login
-                        mode: "outlined"
-                        size_hint_x: None
-                        width: "240dp"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-                        write_tab: False
-
-                        MDTextFieldLeadingIcon:
-                            icon: "account"
-
-                        MDTextFieldHintText:
-                            text: "Login"
-                        MDTextFieldHelperText:
-                            text: "Digite seu nome de usuário"
-# 
-                    MDTextField:
-                        id: password
-                        mode: "outlined"
-                        size_hint_x: None
-                        width: "240dp"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-                        write_tab: False
-                        password: True
-
-                        MDTextFieldHintText:
-                            text: "Senha"
-                        MDTextFieldHelperText:
-                            text: "Digite sua senha"
-
-                        MDTextFieldLeadingIcon:
-                            icon: "key-variant"
-# 
-                    MDButton:
-                        style: "filled"
-                        pos_hint: {"center_x": .5}
-                        size_hint_x: .8
-                        md_bg_color: get_color_from_hex("#2196F3")
-                        on_release: app.authenticate_user()
-                        MDButtonText:
-                            text: "Entrar"
-# 
-                    MDButton:
-                        style: "filled"
-                        pos_hint: {"center_x": .5}
-                        size_hint_x: .8
-                        md_bg_color: get_color_from_hex("#4CAF50")
-                        on_release: app.switch_to_create_account()
-                        MDButtonText:
-                            text: "Criar Conta"
-# 
-<CreateProfileScreen>:
-    name: "create_profile"
-
-    MDBoxLayout:
-        orientation: "vertical"
-# 
-        MDTopAppBar:
-            type: "small"
-# 
-            MDTopAppBarLeadingButtonContainer:
-
-                MDActionTopAppBarButton:
-                    icon: "menu"
-
-            MDTopAppBarTitle:
-                text: "Criar Perfil"
-                pos_hint: {"center_x": .5}
-# 
-#             MDTopAppBarTrailingButtonContainer:
-# 
-#                 MDActionTopAppBarButton:
-#                     icon: "account-circle-outline"
-# 
-        MDFloatLayout:
-            MDCard:
-                size_hint: None, None
-                size: "500dp", "520dp"
-                pos_hint: {"center_x": .5, "center_y": .5}
-                padding: "20dp"
-                spacing: "20dp"
-                elevation: 3
-# 
-                MDBoxLayout:
-                    orientation: "vertical"
-                    spacing: "20dp"
-
-                    MDLabel:
-                        text: "Informações Pessoais"
-                        halign: "center"
-                        theme_text_color: "Primary"
-                        font_style: "Title"
-# 
-                    MDSegmentedButton:
-                        id: gender_select
-                        type: "normal"
-                        adaptive_height: True
-                        radius: 45
-                        pos_hint: {"center_x": .5, "center_y": .5}
-
-                        MDSegmentedButtonItem:
-                            id: male
-                            # on_active: app.on_gender_select(*args)
-                            MDSegmentButtonIcon:
-                                icon: ""
-                            MDSegmentButtonLabel:
-                                text: "Masculino"
-
-                        MDSegmentedButtonItem:
-                            id: female
-                            MDSegmentButtonLabel:
-                                text: "Feminino"
-# 
-                    MDTextField:
-                        id: name
-                        mode: "outlined"
-                        size_hint_x: None
-                        width: "240dp"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-                        write_tab: False
-
-                        MDTextFieldHintText:
-                            text: "Nome"
-                        MDTextFieldHelperText:
-                            text: "Digite seu nome completo"
-
-                        MDTextFieldTrailingIcon:
-                            icon: "account"
-# 
-                    MDTextField:
-                        id: birth_date
-                        mode: "outlined"
-                        size_hint_x: None
-                        width: "240dp"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-                        write_tab: False
-                        readonly: True  # Importante para evitar edição manual
-                        on_focus: app.show_date_picker(self.focus)  # Chama 
-
-                        MDTextFieldHintText:
-                            text: "Data de Nascimento"
-                        MDTextFieldHelperText:
-                            text: "Clique para selecionar a data"
-                        MDTextFieldTrailingIcon:
-                            icon: "calendar"
-# 
-                    MDTextField:
-                        id: weight
-                        mode: "outlined"
-                        size_hint_x: None
-                        width: "240dp"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-                        input_filter: "float"
-                        write_tab: False
-
-                        MDTextFieldHintText:
-                            text: "Peso (kg)"
-                        MDTextFieldHelperText:
-                            text: "Digite seu peso em quilogramas"
-                        MDTextFieldTrailingIcon:
-                            icon: "weight-kilogram"
-
-                    MDTextField:
-                        id: details
-                        mode: "outlined"
-                        size_hint_x: None
-                        width: "240dp"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-                        write_tab: False
-                        max_text_length: 500
-
-                        MDTextFieldHintText:
-                            text: "Detalhes adicionais"
-                        MDTextFieldHelperText:
-                            text: "Digite informações sobre sua saúde"
-
-                    MDButton:
-                        style: "filled"
-                        pos_hint: {"center_x": .5}
-                        size_hint_x: .8
-                        md_bg_color: get_color_from_hex("#4CAF50")
-                        on_release: app.create_profile()
-                        MDButtonText:
-                            text: "Salvar Perfil"
-# 
-<TrackerScreen>:
-    name: "tracker"
-
-    MDBoxLayout:
-        orientation: "vertical"
-
-        MDTopAppBar:
-            type: "small"
-
-            MDTopAppBarLeadingButtonContainer:
-
-                MDActionTopAppBarButton:
-                    icon: "menu"
-
-            MDTopAppBarTitle:
-                text: "Controle Diário"
-                pos_hint: {"center_x": .5}
-# 
-#             MDTopAppBarTrailingButtonContainer:
-# 
-#                 MDActionTopAppBarButton:
-#                     icon: "account-circle-outline"
-# 
-        MDFloatLayout:
-            MDCard:
-                size_hint: None, None
-                size: "320dp", "500dp"
-                pos_hint: {"center_x": .5, "center_y": .5}
-                padding: "20dp"
-                spacing: "20dp"
-                elevation: 3
-
-                MDBoxLayout:
-                    orientation: "vertical"
-                    spacing: "20dp"
-
-                    MDLabel:
-                        id: daily_goal_label
-                        text: "Meta Diária: 0 mL"
-                        halign: "center"
-                        theme_text_color: "Primary"
-                        font_style: "Title"
-                        role: "large"
-# 
-                    MDLabel:
-                        id: progress_label
-                        text: "Progresso: 0 mL"
-                        halign: "center"
-                        theme_text_color: "Secondary"
-
-                    MDLinearProgressIndicator:
-                        id: progress_bar
-                        value: 0
-                        color: get_color_from_hex("#2196F3")
-                        size_hint_x: .9
-                        pos_hint: {"center_x": .5}
-# 
-                    MDBoxLayout:
-                        orientation: "vertical"
-                        spacing: "10dp"
-                        adaptive_height: True
-                        pos_hint: {"center_x": .5}
-
-                        MDBoxLayout:
-                            orientation: "horizontal"
-                            adaptive_height: True
-                            spacing: "10dp"
-
-                            MDTextField:
-                                id: water_add
-                                mode: "outlined"
-                                size_hint_x: None
-                                width: "240dp"
-                                pos_hint: {"center_x": .5, "center_y": .5}
-                                input_filter: "float"
-                                write_tab: False
-# 
-                                MDTextFieldHintText:
-                                    text: "Volume bebido."
-                                MDTextFieldHelperText:
-                                    text: "Digite o volume em mL"
-# 
-                            MDIconButton:
-                                style: "standard"
-                                icon: "water-plus"
-                                on_release: app.add_water(water_add.text)
-                                md_bg_color: get_color_from_hex("#2196F3")
-
-                        MDWidget:
-# 
-                        MDBoxLayout:
-                            orientation: "horizontal"
-                            adaptive_height: True
-                            spacing: "10dp"
-
-                            MDButton:
-                                style: "filled"
-                                on_release: app.add_water(100)
-                                md_bg_color: get_color_from_hex("#2196F3")
-
-                                MDButtonIcon:
-                                    icon: "cup-water"
-                                MDButtonText:
-                                    text: "100mL"
-
-                            MDButton:
-                                style: "filled"
-                                on_release: app.add_water(200)
-                                md_bg_color: get_color_from_hex("#2196F3")
-
-                                MDButtonIcon:
-                                    icon: "cup-water"
-                                MDButtonText:
-                                    text: "200mL"
-# 
-                            MDButton:
-                                style: "filled"
-                                on_release: app.add_water(300)
-                                md_bg_color: get_color_from_hex("#2196F3")
-
-                                MDButtonIcon:
-                                    icon: "cup-water"
-                                MDButtonText:
-                                    text: "300mL"
-# 
-                    MDBoxLayout:
-                        orientation: "horizontal"
-                        spacing: "10dp"
-                        adaptive_height: True
-                        pos_hint: {"center_x": .5}
-
-                        MDButton:
-                            style: "filled"
-                            on_release: app.add_water(500)
-                            md_bg_color: get_color_from_hex("#4CAF50")
-
-                            MDButtonIcon:
-                                icon: "cup-water"
-                            MDButtonText:
-                                text: "500mL"
-
-'''
+from models.user import User
+from models.water_tracker import WaterTracker
+from screens.login.loginscreen import LoginScreen
+from screens.profile.createprofilescreen import CreateProfileScreen
+from screens.trackerscreen.trackerscreen import TrackerScreen
 
 
 #Screens
-class LoginScreen(MDScreen):
-    pass
-
-
-class CreateProfileScreen(MDScreen):
-    pass
-
-
-class TrackerScreen(MDScreen):
-    pass
-
-
 class SettingsScreen(MDScreen):
     pass
 
 
-class HidrataTrackApp(MDApp):
+class MainApp(MDApp):
+
+    # def __init__(self, *args):
+        # super(HidrataTrackApp, self).__init__(*args)
+        # self.user = None  # Placeholder for user data
+        # self.daily_goal = 0
+        # self.progress = 0
+        # self.current_intake = 0
+        # self.set_bars_colors()
+
     def build(self):
         self.user = None  # Placeholder for user data
         self.daily_goal = 0
         self.progress = 0
         self.current_intake = 0
         self.set_bars_colors()
-        self.sm = Builder.load_string(KV)
-        return self.sm
+        self.title = 'HidrataTrack'
+        # Builder.load_file('main.kv')
+        # sm = ScreenManager()
+        # sm.add_widget(LoginScreen(name="login"))
+        # return sm 
+        # return self.sm
+    
+    # def on_start(self):
+    #     self.root.current = "login_screen"
 
     def set_bars_colors(self):
         set_bars_colors(
@@ -437,8 +64,8 @@ class HidrataTrackApp(MDApp):
         )
 
     def authenticate_user(self):
-        login = self.sm.get_screen("login").ids.login.text
-        password = self.sm.get_screen("login").ids.password.text
+        login = self.root.get_screen("login").ids.login.text
+        password = self.root.get_screen("login").ids.password.text
 
         # Placeholder for authentication logic
         if login == "test" and password == "1234":
@@ -452,13 +79,13 @@ class HidrataTrackApp(MDApp):
 
     def create_profile(self):
         """Create a user profile and calculate the daily water goal."""
-        self.sm.get_screen(
+        self.root.get_screen(
             "create_profile").ids.gender_select.adjust_segment_radius(15)
-        user_name = self.sm.get_screen("create_profile").ids.name.text
-        birth_date_field = self.sm.get_screen("create_profile").ids.birth_date
-        user_weight = self.sm.get_screen("create_profile").ids.weight.text
+        user_name = self.root.get_screen("create_profile").ids.name.text
+        birth_date_field = self.root.get_screen("create_profile").ids.birth_date
+        user_weight = self.root.get_screen("create_profile").ids.weight.text
         try:
-            gender_selector: MDSegmentedButton = self.sm.get_screen(
+            gender_selector: MDSegmentedButton = self.root.get_screen(
                 "create_profile").ids.gender_select
             gender = gender_selector.get_marked_items()[0]._label.text
         except IndexError:
@@ -466,7 +93,6 @@ class HidrataTrackApp(MDApp):
             gender_selector.mark_item(force_selected)
             gender = gender_selector.get_marked_items()[0]._label.text
 
-        # Validação da data
         birth_date = birth_date_field.text
         if not birth_date:
             self.show_snackbar("Data de nascimento inválida")
@@ -523,7 +149,6 @@ class HidrataTrackApp(MDApp):
         """
         Esta função será chamada quando uma data for selecionada
         """
-        #pegar o mes e o ano para assim gerar uma data
         birth_date_field = self.root.get_screen(
             'create_profile').ids.birth_date
         data = date(instance.sel_year, instance.sel_month, value)
@@ -544,12 +169,12 @@ class HidrataTrackApp(MDApp):
             print("Por favor, crie um perfil antes.")
             return
 
-        tracker_screen = self.sm.get_screen("tracker")
+        tracker_screen = self.root.get_screen("tracker")
         tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {
         Decimal(self.daily_goal).quantize(Decimal('1.'), rounding=ROUND_UP)} mL"
         tracker_screen.ids.progress_label.text = f"Progresso: {self.progress} mL"
         self.water_tracker = WaterTracker(self.user)
-        self.sm.current = "tracker"
+        self.root.current = "tracker"
 
     def add_water(self, amount):
         """Add water to the progress and update the tracker screen."""
@@ -561,18 +186,18 @@ class HidrataTrackApp(MDApp):
             return "O campo está vazio!"
         self.current_intake = self.water_tracker.current_intake
         self.progress = self.water_tracker.get_progress()
-        tracker_screen = self.sm.get_screen("tracker")
+        tracker_screen = self.root.get_screen("tracker")
         tracker_screen.ids.progress_label.text = f"Progresso: {self.current_intake} mL"
         tracker_screen.ids.water_add.text = ""
         tracker_screen.ids.progress_bar.value = self.progress
 
     def switch_to_profile(self):
         """Switch to the profile screen."""
-        self.sm.current = "create_profile"
+        self.root.current = "create_profile"
 
     def update_weight(self):
         """Update the user's weight and recalculate the daily goal."""
-        new_weight = self.sm.get_screen("settings").ids.new_weight.text
+        new_weight = self.root.get_screen("settings").ids.new_weight.text
 
         if not new_weight or not self.user:
             print("Peso inválido ou perfil não criado.")
@@ -580,7 +205,7 @@ class HidrataTrackApp(MDApp):
 
         self.user["weight"] = float(new_weight)
         self.daily_goal = (float(new_weight) / 20) * 1000
-        self.sm.current = "menu"
+        self.root.current = "menu"
 
     def on_gender_select(self, segmentedcontrol, segmentedcontrolitem):
         self.selected_gender = segmentedcontrolitem.text
@@ -596,4 +221,5 @@ class HidrataTrackApp(MDApp):
 
 
 if __name__ == "__main__":
-    HidrataTrackApp().run()
+    Window.size = (317, 715) # não use para android ou ios
+    MainApp().run()

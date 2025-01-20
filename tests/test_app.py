@@ -1,4 +1,4 @@
-from src.hidratatrack.water_tracker import WaterTracker
+from models.water_tracker import WaterTracker
 
 
 def test_initial_state(tracker):
@@ -52,12 +52,12 @@ def test_custom_goal_recalculation(profile):
     assert tracker.daily_goal == 3000  # 60kg -> 3L
 
 from unittest.mock import Mock
-from src.hidratatrack.main import HidrataTrackApp
+from src.hidratatrack.main import MainApp
 
 def test_login_with_existing_profile():
     """Testa se o login com um perfil existente redireciona para a tela de rastreamento."""
     # Inicializar o aplicativo
-    app = HidrataTrackApp()
+    app = MainApp()
     app.build()
 
     # Mockar o usuário com um perfil existente

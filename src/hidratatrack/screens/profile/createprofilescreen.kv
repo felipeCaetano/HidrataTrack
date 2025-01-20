@@ -1,0 +1,140 @@
+<CreateProfileScreen>:
+    MDBoxLayout:
+        orientation: "vertical"
+        spacing: "8dp"
+
+        MDTopAppBar:
+            type: "small"
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: "menu"
+            MDTopAppBarTitle:
+                text: "Criar Perfil"
+                pos_hint: {"center_x": .5}
+
+        MDScrollView:
+            MDBoxLayout:
+                orientation: "vertical"
+                spacing: "16dp"
+                padding: "16dp"
+                size_hint_y: None
+                height: self.minimum_height
+                
+                # Card com altura adaptativa
+                MDCard:
+                    orientation: "vertical"
+                    padding: "16dp"
+                    size_hint: None, None
+                    size: "280dp", self.minimum_height
+                    pos_hint: {"center_x": .5}
+                    elevation: 2
+                    shadow_radius: 6
+                    shadow_offset: (0, 2)
+                    
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        spacing: "24dp"
+                        adaptive_height: True
+                        size_hint_y: None
+                        height: self.minimum_height
+                        padding: "8dp"
+
+                        # Botões de gênero
+                        MDSegmentedButton:
+                            id: gender_select
+                            size_hint_x: None
+                            width: "248dp"
+                            type: "small"
+                            pos_hint: {"center_x": .5}
+                            
+                            MDSegmentedButtonItem:
+                                id: male
+                                MDSegmentButtonLabel:
+                                    text: "Masculino"
+
+                            MDSegmentedButtonItem:
+                                id: female
+                                MDSegmentButtonLabel:
+                                    text: "Feminino"
+
+                        # Campo Nome
+                        MDTextField:
+                            id: name
+                            mode: "outlined"
+                            size_hint: None, None
+                            height: "80dp"
+                            width: "248dp"
+                            pos_hint: {"center_x": .5}
+                            write_tab: False
+                            
+                            MDTextFieldHintText:
+                                text: "Nome"
+                            MDTextFieldHelperText:
+                                text: "Digite seu nome completo"
+                            MDTextFieldTrailingIcon:
+                                icon: "account"
+
+                        # Campo Data de Nascimento
+                        MDTextField:
+                            id: birth_date
+                            mode: "outlined"
+                            size_hint: None, None
+                            height: "80dp"
+                            width: "248dp"
+                            pos_hint: {"center_x": .5}
+                            readonly: True
+                            on_focus: app.show_date_picker(self.focus)
+                            
+                            MDTextFieldHintText:
+                                text: "Data de Nascimento"
+                            MDTextFieldHelperText:
+                                text: "Clique para selecionar a data"
+                            MDTextFieldTrailingIcon:
+                                icon: "calendar"
+
+                        # Campo Peso
+                        MDTextField:
+                            id: weight
+                            mode: "outlined"
+                            size_hint: None, None
+                            height: "80dp"
+                            width: "248dp"
+                            pos_hint: {"center_x": .5}
+                            input_filter: "float"
+                            write_tab: False
+                            
+                            MDTextFieldHintText:
+                                text: "Peso (kg)"
+                            MDTextFieldHelperText:
+                                text: "Digite seu peso em quilogramas"
+                            MDTextFieldTrailingIcon:
+                                icon: "weight-kilogram"
+
+                        # Campo Detalhes
+                        MDTextField:
+                            id: details
+                            mode: "outlined"
+                            size_hint: None, None
+                            height: "120dp"
+                            width: "248dp"
+                            pos_hint: {"center_x": .5}
+                            write_tab: False
+                            max_text_length: 500
+                            
+                            MDTextFieldHintText:
+                                text: "Detalhes adicionais"
+                            MDTextFieldHelperText:
+                                text: "Digite informações sobre sua saúde"
+
+                        MDButton:
+                            style: "filled"
+                            size_hint: None, None
+                            height: "48dp"
+                            width: "248dp"
+                            pos_hint: {"center_x": .5}
+                            md_bg_color: get_color_from_hex("#4CAF50")
+                            on_release: app.create_profile()
+                            
+                            MDButtonText:
+                                text: "Salvar Perfil"
+                                bold: True

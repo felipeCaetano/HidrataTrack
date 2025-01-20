@@ -1,6 +1,6 @@
 import pytest
-from src.hidratatrack.user import User
-from src.hidratatrack.water_tracker import WaterTracker
+from models.user import User
+from models.water_tracker import WaterTracker
 
 
 def test_user_creation(valid_user):

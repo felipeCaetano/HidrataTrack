@@ -1,9 +1,9 @@
 from datetime import date
 import pytest
 
-from src.hidratatrack.water_tracker import WaterTracker
-from src.hidratatrack.profile import Profile
-from src.hidratatrack.user import User
+from models.water_tracker import WaterTracker
+from models.profile import Profile
+from models.user import User
 
 
 @pytest.fixture
