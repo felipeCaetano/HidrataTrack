@@ -2,6 +2,7 @@
 #:include screens/login/loginscreen.kv
 #:include screens/profile/CreateProfileScreen.kv
 #:include screens/trackerscreen/TrackerScreen.kv
+#:include screens/createuserscreen/createuser.kv
 
 ScreenManager:
     transition: FadeTransition()
@@ -12,6 +13,8 @@ ScreenManager:
     TrackerScreen:
         name: "tracker"
         id: tracker
+    CreateUserScreen:
+        name: "createuser"
     MDScreen:
         name: "screen1"
         MDLabel:

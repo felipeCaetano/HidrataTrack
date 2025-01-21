@@ -1,15 +1,18 @@
 from datetime import date
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from models.water_tracker import WaterTracker
-from models.perfil import Profile
-from models.user import User
+from src.hidratatrack.models.water_tracker import WaterTracker
+from src.hidratatrack.models.perfil import Profile
+from src.hidratatrack.models.user import AppUser
+from src.hidratatrack.models.models import Base, session, User, Profile, WaterIntake
 
 
 @pytest.fixture
 def valid_user():
     """Fixture para criar um usuário válido."""
-    user = User(login="valid_user", password="secure_password")
+    user = AppUser(login="valid_user", password="secure_password")
     return user
 
 @pytest.fixture
@@ -21,3 +24,40 @@ def profile():
 def tracker(profile):
     return WaterTracker(profile)
 
+@pytest.fixture
+def setup_database():
+    """Configuração inicial do banco para testes."""
+    session.query(WaterIntake).delete()
+    session.query(Profile).delete()
+    session.query(AppUser).delete()
+    session.commit()
+
+    user = AppUser(login="testuser", password="testpass")
+    session.add(user)
+    session.commit()
+
+    profile = Profile(
+        user_id=user.id,
+        name="Test User",
+        birth_date=date(1990, 1, 1),
+        weight=70.0,
+        details="Teste"
+    )
+    session.add(profile)
+    session.commit()
+
+    return user, profile
+
+@pytest.fixture(scope="function")
+def test_session():
+    """Configura um banco de dados SQLite temporário para os testes."""
+    engine = create_engine("sqlite:///:memory:")  # Banco de dados em memória
+    Base.metadata.create_all(engine)  # Cria todas as tabelas
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    yield session  # Fornece a sessão para os testes
+
+    session.close()  # Fecha a sessão após o teste
+    engine.dispose()  # Limpa o banco de dados

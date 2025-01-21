@@ -1,8 +1,8 @@
-from models.user import User
+from models.user import AppUser
 
 
 class WaterTracker:
-    def __init__(self, user: User):
+    def __init__(self, user: AppUser):
         self.current_intake = 0
         self.user = user
         self.user.profile.add_observer(self)

@@ -1,10 +1,11 @@
 from models.perfil import Profile
 
 
-class User:
-    def __init__(self, login, password):
+class AppUser:
+    def __init__(self, login, email, password):
         self.login = login
         self.password = password
+        self.email = email
         self.profile = None
 
     def set_profile(self, user):

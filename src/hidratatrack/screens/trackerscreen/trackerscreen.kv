@@ -1,17 +1,17 @@
 <TrackerScreen>:
+    MDTopAppBar:
+        type: "small"
+        pos_hint: {"center_x": .5, "top": 1}
+        MDTopAppBarLeadingButtonContainer:
+            MDActionTopAppBarButton:
+                icon: "menu"
+        MDTopAppBarTitle:
+            text: "Controle Diário"
+            pos_hint: {"center_x": .5}
     MDBoxLayout:
         orientation: "vertical"
         spacing: "8dp"
-
-        MDTopAppBar:
-            type: "small"
-            MDTopAppBarLeadingButtonContainer:
-                MDActionTopAppBarButton:
-                    icon: "menu"
-            MDTopAppBarTitle:
-                text: "Controle Diário"
-                pos_hint: {"center_x": .5}
-# 
+        pos_hint: {"center_x": .5, "top": .95}
         MDBoxLayout:
             orientation: "vertical"
             padding: "16dp"
@@ -24,7 +24,7 @@
                 size_hint: None, None
                 # size: "320dp", "500dp"
                 size: "280dp","500dp"
-                pos_hint: {"center_x": .5, "center_y": .5}
+                pos_hint: {"center_x": .5, "top": .8}
                 elevation: 2
                 shadow_radius: 6
                 shadow_offset: (0, 2)

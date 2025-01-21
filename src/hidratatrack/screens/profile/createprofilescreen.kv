@@ -1,17 +1,18 @@
 <CreateProfileScreen>:
+    MDTopAppBar:
+        type: "small"
+        pos_hint: {"center_x": .5, "top": 1}
+        MDTopAppBarLeadingButtonContainer:
+            MDActionTopAppBarButton:
+                icon: "menu"
+        MDTopAppBarTitle:
+            text: "Criar Perfil"
+            pos_hint: {"center_x": .5}
+
     MDBoxLayout:
         orientation: "vertical"
         spacing: "8dp"
-
-        MDTopAppBar:
-            type: "small"
-            MDTopAppBarLeadingButtonContainer:
-                MDActionTopAppBarButton:
-                    icon: "menu"
-            MDTopAppBarTitle:
-                text: "Criar Perfil"
-                pos_hint: {"center_x": .5}
-
+        pos_hint: {"center_x": .5, "top": .9}
         MDScrollView:
             MDBoxLayout:
                 orientation: "vertical"
@@ -20,7 +21,6 @@
                 size_hint_y: None
                 height: self.minimum_height
                 
-                # Card com altura adaptativa
                 MDCard:
                     orientation: "vertical"
                     padding: "16dp"
@@ -39,7 +39,6 @@
                         height: self.minimum_height
                         padding: "8dp"
 
-                        # Botões de gênero
                         MDSegmentedButton:
                             id: gender_select
                             size_hint_x: None
@@ -57,7 +56,6 @@
                                 MDSegmentButtonLabel:
                                     text: "Feminino"
 
-                        # Campo Nome
                         MDTextField:
                             id: name
                             mode: "outlined"
@@ -74,7 +72,6 @@
                             MDTextFieldTrailingIcon:
                                 icon: "account"
 
-                        # Campo Data de Nascimento
                         MDTextField:
                             id: birth_date
                             mode: "outlined"
@@ -92,7 +89,6 @@
                             MDTextFieldTrailingIcon:
                                 icon: "calendar"
 
-                        # Campo Peso
                         MDTextField:
                             id: weight
                             mode: "outlined"
@@ -110,7 +106,6 @@
                             MDTextFieldTrailingIcon:
                                 icon: "weight-kilogram"
 
-                        # Campo Detalhes
                         MDTextField:
                             id: details
                             mode: "outlined"
