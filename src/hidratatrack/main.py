@@ -18,6 +18,7 @@ from kivymd.uix.pickers import MDDockedDatePicker
 
 from kivy.clock import Clock
 
+from models.perfil import Profile
 from models.user import User
 from models.water_tracker import WaterTracker
 from screens.login.loginscreen import LoginScreen
@@ -32,20 +33,20 @@ class SettingsScreen(MDScreen):
 
 class MainApp(MDApp):
 
-    # def __init__(self, *args):
-        # super(HidrataTrackApp, self).__init__(*args)
-        # self.user = None  # Placeholder for user data
-        # self.daily_goal = 0
-        # self.progress = 0
-        # self.current_intake = 0
-        # self.set_bars_colors()
-
-    def build(self):
+    def __init__(self, *args):
+        super(MainApp, self).__init__(*args)
         self.user = None  # Placeholder for user data
         self.daily_goal = 0
         self.progress = 0
         self.current_intake = 0
         self.set_bars_colors()
+
+    def build(self):
+        # self.user = None  # Placeholder for user data
+        # self.daily_goal = 0
+        # self.progress = 0
+        # self.current_intake = 0
+        # self.set_bars_colors()
         self.title = 'HidrataTrack'
         # Builder.load_file('main.kv')
         # sm = ScreenManager()
@@ -84,14 +85,15 @@ class MainApp(MDApp):
         user_name = self.root.get_screen("create_profile").ids.name.text
         birth_date_field = self.root.get_screen("create_profile").ids.birth_date
         user_weight = self.root.get_screen("create_profile").ids.weight.text
-        try:
-            gender_selector: MDSegmentedButton = self.root.get_screen(
+        gender_selector: MDSegmentedButton = self.root.get_screen(
                 "create_profile").ids.gender_select
+        details = self.root.get_screen("create_profile").ids.details.text
+        try:
             gender = gender_selector.get_marked_items()[0]._label.text
         except IndexError:
-            force_selected = gender_selector.get_items()[0]
+            force_selected = gender_selector.get_items()[1]
             gender_selector.mark_item(force_selected)
-            gender = gender_selector.get_marked_items()[0]._label.text
+            gender = gender_selector.get_marked_items()[1]._label.text
 
         birth_date = birth_date_field.text
         if not birth_date:
@@ -104,18 +106,23 @@ class MainApp(MDApp):
             self.show_snackbar("Por favor, preencha todos os campos.")
             return
 
-        user = {
-            "nome": user_name,
-            "peso": float(user_weight),
-            "data_nascimento": date_obj,
-            "genero": gender,
-            "detalhes": []
-        }
-        # Profile(nome, genero, data_nascimento, peso, detalhes)
-        self.user.set_profile(user)
+        # user = {
+        #     "nome": user_name,
+        #     "peso": float(user_weight),
+        #     "data_nascimento": date_obj,
+        #     "genero": gender,
+        #     "detalhes": details
+        # }
+        user_profile = Profile(
+            nome=user_name,
+            genero=gender,
+            data_nascimento=date_obj,
+            peso=user_weight,
+            detalhes=details)
+        self.user.profile = user_profile
         self.daily_goal = self.user.profile.daily_goal
         if self.user.profile is not None:
-            print(f"Perfil criado: {self.user}")
+            self.show_snackbar(f"Perfil criado: {self.user}")
             self.switch_to_tracker()
 
     def show_date_picker(self, focus):

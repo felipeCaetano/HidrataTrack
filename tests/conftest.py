@@ -2,7 +2,7 @@ from datetime import date
 import pytest
 
 from models.water_tracker import WaterTracker
-from models.profile import Profile
+from models.perfil import Profile
 from models.user import User
 
 

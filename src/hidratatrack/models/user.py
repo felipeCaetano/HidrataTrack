@@ -1,4 +1,4 @@
-from profile import Profile
+from models.perfil import Profile
 
 
 class User:

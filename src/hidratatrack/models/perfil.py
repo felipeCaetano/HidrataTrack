@@ -2,7 +2,7 @@ from datetime import date
 
 
 class Profile:
-    def __init__(self, nome, genero, data_nascimento, peso, detalhes):
+    def __init__(self, nome=None, genero=None, data_nascimento=None, peso=None, detalhes=None):
         self.nome = nome
         self.genero = genero
         self.data_nascimento = data_nascimento
