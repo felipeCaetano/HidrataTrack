@@ -22,8 +22,7 @@ class CreateUserScreen(MDScreen):
         user_db = self.app.save_user(self.user)
         if user_db:
              self.switch_to_login()
-        
-    
+
     def clear_fields(self):
         self.ids.login.text = ''
         self.ids.email.text = ''

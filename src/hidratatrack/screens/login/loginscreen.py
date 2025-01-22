@@ -2,7 +2,6 @@ from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 
 from models.models import session, User
-from models.user import AppUser
 
 
 class LoginScreen(MDScreen):
@@ -14,7 +13,6 @@ class LoginScreen(MDScreen):
       login = self.ids.login.text
       password = self.ids.password.text
       user = session.query(User).filter_by(login=login).first()
-      # Placeholder for authentication logic
       if user and user.password == password:
          self.app.user = user
          self.app.show_snackbar(f"{login} logado com sucesso.")
