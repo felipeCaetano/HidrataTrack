@@ -1,6 +1,10 @@
-from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, Float
+from datetime import datetime
+
+from sqlalchemy import DateTime, create_engine, Column, Integer, String, Date, ForeignKey, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+import bcrypt
+
 
 Base = declarative_base()
 
@@ -16,8 +20,13 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     login = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
+    password = Column('password', String(128), nullable=False)  # Bcrypt hashes are longer than SHA-256
+    password_changed_at = Column(DateTime, default=datetime.utcnow)
+    failed_login_attempts = Column(Integer, default=0)
+    last_failed_login = Column(DateTime)
     profiles = relationship("Profile", back_populates="user", uselist=False)
+
+    BCRYPT_WORK_FACTOR = 12
 
 class Profile(Base):
     __tablename__ = 'profiles'

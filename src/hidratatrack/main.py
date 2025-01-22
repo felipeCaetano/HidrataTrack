@@ -1,11 +1,12 @@
+import os
 from datetime import date, datetime
 from decimal import ROUND_UP, Decimal
 
 from kivy.core.window import Window
-from kivymd.uix.segmentedbutton import MDSegmentedButton
-from kivy.lang import Builder
-from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 from kivy.metrics import dp
+from kivy.resources import resource_add_path
+from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
+from kivymd.uix.segmentedbutton import MDSegmentedButton
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
@@ -15,8 +16,6 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.utils.set_bars_colors import set_bars_colors
 from kivymd.uix.pickers import MDDockedDatePicker
-
-from kivy.clock import Clock
 
 from models import models
 from models.models import session, User
@@ -29,6 +28,24 @@ from screens.trackerscreen.trackerscreen import TrackerScreen
 from screens.createuserscreen.createuser import CreateUserScreen
 
 
+def setup_resources():
+    """
+    Configura os caminhos para recursos do aplicativo.
+    Deve ser chamada antes de carregar as telas.
+    """
+    # Obtém o diretório base do projeto
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    
+    # Adiciona o diretório de assets aos recursos
+    assets_path = os.path.join(base_path, 'login', 'assets')
+    resource_add_path(assets_path)
+    
+    # Verifica se o arquivo existe e está acessível
+    image_path = os.path.join(assets_path, 'hidratatrack.png')
+    if not os.path.exists(image_path):
+        print(f"AVISO: Imagem não encontrada em {image_path}")
+        print(f"Diretório atual: {os.getcwd()}")
+
 class MainApp(MDApp):
 
     def __init__(self, *args):
@@ -40,6 +57,7 @@ class MainApp(MDApp):
         self.set_bars_colors()
 
     def build(self):
+        # setup_resources()
         self.title = 'HidrataTrack'
 
     def set_bars_colors(self):

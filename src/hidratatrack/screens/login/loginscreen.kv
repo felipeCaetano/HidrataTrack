@@ -1,99 +1,106 @@
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 
 <LoginScreen>
-
-    MDBoxLayout:
-        orientation: "vertical"
-        spacing: "30dp"
-
-        MDFloatLayout:
-            MDCard:
+    MDFloatLayout:
+        md_bg_color: self.theme_cls.backgroundColor
+        spacing: "10dp"
+        MDBoxLayout:
+            orientation: "vertical"
+            size_hint_y: 0.3  # Reduzido para ocupar menos espaço vertical
+            pos_hint: {"top": 1}  # Garante que fique no topo da tela
+                
+            FitImage:
+                source: 'assets/hidratatrack.png'
                 size_hint: None, None
-                size: "300dp", "400dp"
+                size: "120dp", "120dp"
                 pos_hint: {"center_x": .5, "center_y": .5}
-                padding: "20dp"
-                spacing: "30dp"
+                # fit_mode: 'contain'
+            MDWidget:
+    
+        MDBoxLayout:
+            orientation: "vertical"
+            spacing: "20dp"
+            size_hint_y: .65
+            pos_hint: {"center_x": .5, "center_y": .5}
+
+            MDCard:
+                orientation: 'vertical'
+                size_hint: None, 1
+                width: "300dp"
+                pos_hint: {"center_x": .5, "y": 1}
+                padding: "5dp"
+                spacing: "20dp"
                 elevation: 3
-                adaptive_height: True
- 
-                MDBoxLayout:
-                    orientation: "vertical"
-                    spacing: "15dp"
+
+                MDLabel:
+                    text: "Bem-vindo"
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    font_style: "Display"
+                    role: "small"
                     adaptive_height: True
+                    size_hint_y: None
+                    height: self.texture_size[1]
 
-                    MDAnchorLayout:
-                        size_hint: 1, None
-                        height: "120dp"  # Ajuste este valor conforme necessário
-                        padding: "10dp"
-                        
-                        FitImage:
-                            source: "hidratatrack.png"
-                            size_hint: None, None
-                            size: "120dp", "120dp"  # Ajuste este valor conforme necessário
-                            pos_hint: {"center_x": .5, "center_y": .5}
+                MDTextField:
+                    id: login
+                    mode: "outlined"
+                    size_hint_x: None
+                    width: "240dp"
+                    pos_hint: {"center_x": .5}
+                    write_tab: False
 
-                    MDLabel:
-                        text: "Bem-vindo"
-                        halign: "center"
-                        theme_text_color: "Primary"
-                        font_style: "Display"
-                        role: "small"
-                        adaptive_height: True
+                    MDTextFieldLeadingIcon:
+                        icon: "account"
 
-                    MDTextField:
-                        id: login
-                        mode: "outlined"
-                        size_hint_x: None
-                        width: "240dp"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-                        write_tab: False
+                    MDTextFieldHintText:
+                        text: "Login"
 
-                        MDTextFieldLeadingIcon:
-                            icon: "account"
+                    MDTextFieldHelperText:
+                        text: "Digite seu nome de usuário"
 
-                        MDTextFieldHintText:
-                            text: "Login"
-                        MDTextFieldHelperText:
-                            text: "Digite seu nome de usuário"
+                # Campo de senha
+                MDTextField:
+                    id: password
+                    mode: "outlined"
+                    size_hint_x: None
+                    width: "240dp"
+                    pos_hint: {"center_x": .5}
+                    write_tab: False
+                    password: True
 
-                    MDTextField:
-                        id: password
-                        mode: "outlined"
-                        size_hint_x: None
-                        width: "240dp"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-                        write_tab: False
-                        password: True
+                    MDTextFieldLeadingIcon:
+                        icon: "key-variant"
 
-                        MDTextFieldHintText:
-                            text: "Senha"
-                        MDTextFieldHelperText:
-                            text: "Digite sua senha"
+                    MDTextFieldHintText:
+                        text: "Senha"
 
-                        MDTextFieldLeadingIcon:
-                            icon: "key-variant"
+                    MDTextFieldHelperText:
+                        text: "Digite sua senha"
 
-                    MDButton:
-                        style: "text"
+                MDButton:
+                    style: "text"
+                    pos_hint: {"center_x": .5}
+                    
+                    MDButtonText:
+                        text: "Esqueci minha senha"
 
-                        MDButtonText:
-                            text: "Esqueci minha senha"
+                MDButton:
+                    style: "filled"
+                    pos_hint: {"center_x": .5}
+                    size_hint_x: .8
+                    md_bg_color: get_color_from_hex("#2196F3")
+                    on_release: root.authenticate_user()
+                    
+                    MDButtonText:
+                        text: "Entrar"
 
-                    MDButton:
-                        style: "filled"
-                        pos_hint: {"center_x": .5}
-                        size_hint_x: .8
-                        md_bg_color: get_color_from_hex("#2196F3")
-                        on_release: root.authenticate_user()
-                        MDButtonText:
-                            text: "Entrar"
-
-                    MDButton:
-                        style: "filled"
-                        pos_hint: {"center_x": .5}
-                        size_hint_x: .8
-                        md_bg_color: get_color_from_hex("#4CAF50")
-                        on_release: app.switch_to_create_account()
-                        MDButtonText:
-                            text: "Criar Conta"
-                            
+                MDButton:
+                    style: "filled"
+                    pos_hint: {"center_x": .5}
+                    size_hint_x: .8
+                    md_bg_color: get_color_from_hex("#4CAF50")
+                    on_release: app.switch_to_create_account()
+                    
+                    MDButtonText:
+                        text: "Criar Conta"
