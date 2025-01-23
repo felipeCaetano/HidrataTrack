@@ -4,18 +4,14 @@ from kivymd.uix.screen import MDScreen
 from sqlalchemy.exc import SQLAlchemyError
 
 from models.models import session, User
+from models.security import hash_password
 
 
 class LoginScreen(MDScreen):
    def __init__(self, **kwargs):
       super(LoginScreen, self).__init__(**kwargs)
       self.app = MDApp.get_running_app()
-      # self.ids.login.text = ""
-      # self.ids.password.text = ""
 
-   def _hash_password(self, password):
-      """Cria um hash seguro da senha usando SHA-256"""
-      return hashlib.sha256(password.encode()).hexdigest()
    
    def _validate_inputs(self, login, password):
       """Valida os campos de entrada antes de tentar autenticar"""
@@ -46,7 +42,7 @@ class LoginScreen(MDScreen):
          if not self._validate_inputs(login, password):
             return
          user = session.query(User).filter_by(login=login).first()
-         if user and user.password == self._hash_password(password):
+         if user and user.password == hash_password(password):
             self._handle_successful_login(user)
          else:
              self.app.show_snackbar("Login ou senha inválidos.")

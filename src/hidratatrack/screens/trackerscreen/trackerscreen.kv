@@ -8,12 +8,10 @@
                 icon: "menu"
         MDTopAppBarTitle:
             text: "Controle Diário"
-            # pos_hint: {"center_x": .5}
-
+            pos_hint: {"center_x": .5}
     MDFloatLayout:
         md_bg_color: self.theme_cls.backgroundColor
         pos_hint: {'center_x':.5, 'top': .91}
-
 
         MDCard:
             orientation: "vertical"
@@ -35,20 +33,17 @@
                 theme_text_color: "Primary"
                 font_style: "Title"
                 role: "large"
-# 
             MDLabel:
                 id: progress_label
                 text: "Progresso: 0 mL"
                 halign: "center"
                 theme_text_color: "Secondary"
-
             MDLinearProgressIndicator:
                 id: progress_bar
                 value: 0
                 color: get_color_from_hex("#2169F3")
                 size_hint_x: .9
                 pos_hint: {"center_x": .5}
-
             MDBoxLayout:
                 orientation: "horizontal"
                 adaptive_size: True
@@ -63,22 +58,23 @@
                     pos_hint: {"center_x": .5}
                     input_filter: "float"
                     write_tab: False
-# 
+ 
                     MDTextFieldHintText:
                         text: "Volume"
                     MDTextFieldHelperText:
                         text: "Digite o volume em mL"
-# 
                 MDIconButton:
                     style: "standard"
                     icon: "water-plus"
                     on_release: app.add_water(water_add.text)
-                    md_bg_color: get_color_from_hex("#2196F3")
-# 
+                    md_bg_color: get_color_from_hex("#2196F3") 
             MDGridLayout:
                 adaptive_height: True
                 spacing: "10dp"
-                rows: 2
+                cols: 3
+                pos_hint: {'center_x':.5}
+                size_hint_x: None  # Importante para o dimensionamento correto
+                width: self.minimum_width  # Usa a largura mínima necessária
 
                 MDButton:
                     style: "filled"
@@ -89,7 +85,6 @@
                         icon: "cup-water"
                     MDButtonText:
                         text: "100mL"
-
                 MDButton:
                     style: "filled"
                     on_release: app.add_water(200)
@@ -99,7 +94,6 @@
                         icon: "cup-water"
                     MDButtonText:
                         text: "200mL"
-# 
                 MDButton:
                     style: "filled"
                     on_release: app.add_water(300)
@@ -109,7 +103,6 @@
                         icon: "cup-water"
                     MDButtonText:
                         text: "300mL"
-
                 MDButton:
                     style: "filled"
                     on_release: app.add_water(500)
@@ -119,4 +112,14 @@
                         icon: "cup-water"
                     MDButtonText:
                         text: "500mL"
+                MDButton:
+                    id: personal
+                    style: "filled"
+                    on_release: app.add_water(root.user_definide)
+                    md_bg_color: get_color_from_hex("#4CAF50")
+
+                    MDButtonIcon:
+                        icon: "cup-water"
+                    MDButtonText:
+                        text: "MinhamL"
             MDWidget:

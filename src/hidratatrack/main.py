@@ -6,7 +6,6 @@ from kivy.core.window import Window
 from kivy.metrics import dp
 from kivy.resources import resource_add_path
 from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
-from kivymd.uix.segmentedbutton import MDSegmentedButton
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
@@ -17,9 +16,10 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.utils.set_bars_colors import set_bars_colors
 from kivymd.uix.pickers import MDDockedDatePicker
 
+import models.perfil
 from models import models
 from models.models import session, User
-from models.perfil import Profile
+from models.models import Profile
 from models.user import AppUser
 from models.water_tracker import WaterTracker
 from screens.login.loginscreen import LoginScreen
@@ -27,24 +27,6 @@ from screens.profile.createprofilescreen import CreateProfileScreen
 from screens.trackerscreen.trackerscreen import TrackerScreen
 from screens.createuserscreen.createuser import CreateUserScreen
 
-
-def setup_resources():
-    """
-    Configura os caminhos para recursos do aplicativo.
-    Deve ser chamada antes de carregar as telas.
-    """
-    # Obtém o diretório base do projeto
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    
-    # Adiciona o diretório de assets aos recursos
-    assets_path = os.path.join(base_path, 'login', 'assets')
-    resource_add_path(assets_path)
-    
-    # Verifica se o arquivo existe e está acessível
-    image_path = os.path.join(assets_path, 'hidratatrack.png')
-    if not os.path.exists(image_path):
-        print(f"AVISO: Imagem não encontrada em {image_path}")
-        print(f"Diretório atual: {os.getcwd()}")
 
 class MainApp(MDApp):
 
@@ -57,7 +39,6 @@ class MainApp(MDApp):
         self.set_bars_colors()
 
     def build(self):
-        # setup_resources()
         self.title = 'HidrataTrack'
 
     def set_bars_colors(self):
@@ -66,47 +47,6 @@ class MainApp(MDApp):
             self.theme_cls.primary_palette,  # navigation bar color
             "Light",  # icons color of status bar
         )
-
-    def create_profile(self):
-        """Create a user profile and calculate the daily water goal."""
-        self.root.get_screen(
-            "create_profile").ids.gender_select.adjust_segment_radius(15)
-        user_name = self.root.get_screen("create_profile").ids.name.text
-        birth_date_field = self.root.get_screen("create_profile").ids.birth_date
-        user_weight = self.root.get_screen("create_profile").ids.weight.text
-        gender_selector: MDSegmentedButton = self.root.get_screen(
-                "create_profile").ids.gender_select
-        details = self.root.get_screen("create_profile").ids.details.text
-        try:
-            gender = gender_selector.get_marked_items()[0]._label.text
-        except IndexError:
-            force_selected = gender_selector.get_items()[1]
-            gender_selector.mark_item(force_selected)
-            gender = gender_selector.get_marked_items()[1]._label.text
-
-        birth_date = birth_date_field.text
-        if not birth_date:
-            self.show_snackbar("Data de nascimento inválida")
-            return
-        else:
-            date_obj = datetime.strptime(birth_date, '%d/%m/%Y')
-
-        if not all([user_name, user_weight, gender, date_obj]):
-            self.show_snackbar("Por favor, preencha todos os campos.")
-            return
-        
-        user_profile = Profile(
-            nome=user_name,
-            genero=gender,
-            data_nascimento=date_obj,
-            peso=user_weight,
-            detalhes=details)
-        
-        self.user.profile = user_profile
-        self.daily_goal = self.user.profile.daily_goal
-        if self.user.profile is not None:
-            self.show_snackbar(f"Perfil criado: {self.user}")
-            self.switch_to_tracker()
 
     def save_user(self, user: AppUser):
         """Salva um usuário no banco de dados."""
@@ -119,6 +59,21 @@ class MainApp(MDApp):
         session.commit()
         self.show_snackbar(f"Usuário {new_user.login} salvo com sucesso.")
         return user
+    
+    def save_profile(self, profile: Profile):
+        existing_profile = session.query(Profile).filter_by(nome=profile.nome).first()
+        if existing_profile:
+            self.show_snackbar(f"Perfil {profile.nome} já existe.")
+            return existing_profile
+        # new_profile = Profile(
+        #     name=profile.nome,
+        #     birth_date=profile.data_nascimento,
+        #     weight=profile.peso, details=profile.detalhes)
+        session.add(profile)
+        session.commit()
+        self.show_snackbar(f"Usuário {profile.nome} salvo com sucesso.")
+        return profile
+
 
     def show_date_picker(self, focus):
         if not focus:
