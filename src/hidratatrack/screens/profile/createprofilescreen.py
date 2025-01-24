@@ -4,7 +4,7 @@ from kivymd.app import MDApp
 from kivymd.uix.segmentedbutton import MDSegmentedButton
 from kivymd.uix.screen import MDScreen
 
-from models.perfil import Profile
+from models.models import Profile
 
 
 class CreateProfileScreen(MDScreen):
@@ -40,15 +40,14 @@ class CreateProfileScreen(MDScreen):
             self.app.show_snackbar("Por favor, preencha todos os campos.")
             return
         
-        user_profile = Profile(
-            nome=user_name,
-            genero=gender,
-            data_nascimento=date_obj,
-            peso=user_weight,
-            detalhes=details)
+        user_profile = Profile(user_id=self.app.user.id, name=user_name,
+                               gender=gender, birth_date=date_obj,
+                               weight=user_weight, details=details,
+                               user=self.app.user)
         
         self.app.user.profile = user_profile
-        self.app.daily_goal = self.app.user.profile.daily_goal
+        self.app.daily_goal = self.app.user.profile.calculate_goal(
+            user_profile.weight)
         if self.app.user.profile is not None:
             self.app.save_profile(user_profile)
             # self.app.show_snackbar(

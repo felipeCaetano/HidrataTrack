@@ -3,7 +3,7 @@ from datetime import date
 
 class Profile:
     def __init__(self, nome=None, genero=None, data_nascimento=None, peso=None, detalhes=None):
-        self.nome = nome
+        self.name = nome
         self.genero = genero
         self.data_nascimento = data_nascimento
         self.idade = self.get_age()
@@ -46,5 +46,5 @@ class Profile:
     @staticmethod
     def create_profile(name, weight):
         return Profile(
-            nome=name, genero="Seu genero", data_nascimento=date(1993, 1, 1), peso=weight, detalhes="Nenhum"
+            name=name, genero="Seu genero", data_nascimento=date(1993, 1, 1), peso=weight, detalhes="Nenhum"
             )

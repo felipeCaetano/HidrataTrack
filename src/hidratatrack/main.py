@@ -1,25 +1,17 @@
-import os
-from datetime import date, datetime
+from datetime import date
 from decimal import ROUND_UP, Decimal
 
 from kivy.core.window import Window
 from kivy.metrics import dp
-from kivy.resources import resource_add_path
-from kivy.uix.screenmanager import Screen, ScreenManager, FadeTransition
 from kivymd.app import MDApp
-from kivymd.uix.screen import MDScreen
 from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
-from kivymd.uix.button import MDButton, MDButtonIcon, MDButtonText
-from kivymd.uix.textfield import MDTextField
-from kivymd.uix.label import MDLabel
-from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.utils.set_bars_colors import set_bars_colors
 from kivymd.uix.pickers import MDDockedDatePicker
 
-import models.perfil
-from models import models
 from models.models import session, User
 from models.models import Profile
+from models.user import AppUser
+from models.water_tracker import WaterTracker
 from models.user import AppUser
 from models.water_tracker import WaterTracker
 from screens.login.loginscreen import LoginScreen
@@ -61,17 +53,14 @@ class MainApp(MDApp):
         return user
     
     def save_profile(self, profile: Profile):
-        existing_profile = session.query(Profile).filter_by(nome=profile.nome).first()
+        existing_profile = session.query(Profile).filter_by(name=profile.name).first()
         if existing_profile:
-            self.show_snackbar(f"Perfil {profile.nome} já existe.")
+            self.show_snackbar(f"Perfil {profile.name} já existe.")
             return existing_profile
-        # new_profile = Profile(
-        #     name=profile.nome,
-        #     birth_date=profile.data_nascimento,
-        #     weight=profile.peso, details=profile.detalhes)
+       
         session.add(profile)
         session.commit()
-        self.show_snackbar(f"Usuário {profile.nome} salvo com sucesso.")
+        self.show_snackbar(f"Usuário {profile.name} salvo com sucesso.")
         return profile
 
 

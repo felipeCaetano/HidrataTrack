@@ -5,11 +5,11 @@ class WaterTracker:
     def __init__(self, user: AppUser):
         self.current_intake = 0
         self.user = user
-        self.user.profile.add_observer(self)
+        self.user.profiles.add_observer(self)
         self.daily_goal = self.calculate_daily_goal()
 
     def calculate_daily_goal(self):
-        return self.user.profile.daily_goal
+        return self.user.profiles.daily_goal
 
     def add_water(self, water_volume: float):
         if water_volume > 0:

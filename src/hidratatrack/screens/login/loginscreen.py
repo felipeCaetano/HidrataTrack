@@ -51,5 +51,5 @@ class LoginScreen(MDScreen):
          print(f"Erro de banco de dados: {str(db_error)}")
       except Exception as e:
          self.app.show_snackbar("Ocorreu um erro inesperado. Tente novamente.")
-         print(f"Erro inesperado: {str(e)}")
+         print(f"Erro inesperado: {str(e.args)}")
         
