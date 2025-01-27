@@ -1,12 +1,12 @@
 import pytest
-
-from src.hidratatrack.main import HidrataTrackApp
-
+from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager
+from src.hidratatrack.main import MainApp  # Substitua com o nome correto do arquivo.
 
 class TestHidrataTrackApp:
 
     def setup_method(self):
-        self.app = HidrataTrackApp()
+        self.app = MainApp()
         self.app.build()
 
     def teardown_method(self):

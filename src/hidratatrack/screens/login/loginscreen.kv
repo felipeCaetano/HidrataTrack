@@ -1,0 +1,106 @@
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+
+<LoginScreen>
+    MDFloatLayout:
+        md_bg_color: self.theme_cls.backgroundColor
+        spacing: "10dp"
+        MDBoxLayout:
+            orientation: "vertical"
+            size_hint_y: 0.3  # Reduzido para ocupar menos espaço vertical
+            pos_hint: {"top": 1}  # Garante que fique no topo da tela
+                
+            FitImage:
+                source: 'assets/hidratatrack.png'
+                size_hint: None, None
+                size: "120dp", "120dp"
+                pos_hint: {"center_x": .5, "center_y": .5}
+                # fit_mode: 'contain'
+            MDWidget:
+    
+        MDBoxLayout:
+            orientation: "vertical"
+            spacing: "20dp"
+            size_hint_y: .65
+            pos_hint: {"center_x": .5, "center_y": .5}
+
+            MDCard:
+                orientation: 'vertical'
+                size_hint: None, 1
+                width: "300dp"
+                pos_hint: {"center_x": .5, "y": 1}
+                padding: "5dp"
+                spacing: "20dp"
+                elevation: 3
+
+                MDLabel:
+                    text: "Bem-vindo"
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    font_style: "Display"
+                    role: "small"
+                    adaptive_height: True
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDTextField:
+                    id: login
+                    mode: "outlined"
+                    size_hint_x: None
+                    width: "240dp"
+                    pos_hint: {"center_x": .5}
+                    write_tab: False
+
+                    MDTextFieldLeadingIcon:
+                        icon: "account"
+
+                    MDTextFieldHintText:
+                        text: "Login"
+
+                    MDTextFieldHelperText:
+                        text: "Digite seu nome de usuário"
+
+                # Campo de senha
+                MDTextField:
+                    id: password
+                    mode: "outlined"
+                    size_hint_x: None
+                    width: "240dp"
+                    pos_hint: {"center_x": .5}
+                    write_tab: False
+                    password: True
+
+                    MDTextFieldLeadingIcon:
+                        icon: "key-variant"
+
+                    MDTextFieldHintText:
+                        text: "Senha"
+
+                    MDTextFieldHelperText:
+                        text: "Digite sua senha"
+
+                MDButton:
+                    style: "text"
+                    pos_hint: {"center_x": .5}
+                    
+                    MDButtonText:
+                        text: "Esqueci minha senha"
+
+                MDButton:
+                    style: "filled"
+                    pos_hint: {"center_x": .5}
+                    size_hint_x: .8
+                    md_bg_color: get_color_from_hex("#2196F3")
+                    on_release: root.authenticate_user()
+                    
+                    MDButtonText:
+                        text: "Entrar"
+
+                MDButton:
+                    style: "filled"
+                    pos_hint: {"center_x": .5}
+                    size_hint_x: .8
+                    md_bg_color: get_color_from_hex("#4CAF50")
+                    on_release: app.switch_to_create_account()
+                    
+                    MDButtonText:
+                        text: "Criar Conta"

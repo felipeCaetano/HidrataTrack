@@ -1,0 +1,39 @@
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:include screens/login/loginscreen.kv
+#:include screens/profile/createprofilescreen.kv
+#:include screens/trackerscreen/trackerscreen.kv
+#:include screens/createuserscreen/createuser.kv
+
+ScreenManager:
+    transition: FadeTransition()
+    LoginScreen:
+        name: "login"
+    CreateProfileScreen:
+        name: "create_profile"
+    TrackerScreen:
+        name: "tracker"
+        id: tracker
+    CreateUserScreen:
+        name: "createuser"
+    MDScreen:
+        name: "screen1"
+        MDLabel:
+            text: "Welcome"
+
+#     LoginScreen:
+#         name: "login_screen"
+#         id: login_screen
+        
+#     TrackerScreen:
+#         name: "tracker"
+#         id: tracker
+
+#     CreateProfileScreen:
+#         name: "create_profile"
+#         id: create_profile
+#     SettingsScreen:
+#         name: "settings_screen"
+#         id: settings
+
+# MDLabel:
+#     text: "Welcome"
