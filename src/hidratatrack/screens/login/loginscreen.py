@@ -29,7 +29,7 @@ class LoginScreen(MDScreen):
       self.ids.password.text = ""
       
       # Decide para qual tela navegar
-      if not user.profiles:  # usando not ao invés de is None para mais flexibilidade
+      if user.profiles is None:  # usando not ao invés de is None para mais flexibilidade
          self.app.switch_to_profile(user)
       else:
          self.app.switch_to_tracker()
@@ -49,7 +49,8 @@ class LoginScreen(MDScreen):
       except SQLAlchemyError as db_error:
          self.app.show_snackbar("Erro ao conectar com o banco de dados. Tente novamente.")
          print(f"Erro de banco de dados: {str(db_error)}")
-      except Exception as e:
-         self.app.show_snackbar("Ocorreu um erro inesperado. Tente novamente.")
-         print(f"Erro inesperado: {str(e.args)}")
+      # except Exception as e:
+      #    self.app.show_snackbar("Ocorreu um erro inesperado. Tente novamente.")
+      #    print(f"Erro inesperado: {str(e)}")
+      #    print(Exception)
         

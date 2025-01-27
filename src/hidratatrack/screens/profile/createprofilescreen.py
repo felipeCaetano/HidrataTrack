@@ -11,9 +11,6 @@ class CreateProfileScreen(MDScreen):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.app = MDApp.get_running_app()
-    
-    # def on_start(self):
-    #     self.ids.gender_select.adjust_segment_radius(15)
 
     def create_profile(self):
         """Create a user profile and calculate the daily water goal."""

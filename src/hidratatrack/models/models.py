@@ -16,15 +16,17 @@ session = Session()
 
 class Observable:
     def __init__(self):
-        self._observers = []
+        self.observers = []
 
     def add_observer(self, observer):
         """Adiciona um novo observador."""
-        self._observers.append(observer)
+        if self.observers is None:
+            self.observers = []
+        self.observers.append(observer)
 
     def remove_observer(self, observer):
         """Remove um observador existente."""
-        self._observers.remove(observer)
+        self.observers.remove(observer)
 
     def notify_observers(self, *args, **kwargs):
         """Notifica todos os observadores sobre uma mudança."""
@@ -42,7 +44,7 @@ class User:
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     profiles: Optional[Mapped["Profile"]] = relationship(
-        "Profile", back_populates="user", uselist=False, init=False)
+        "Profile", back_populates="user", uselist=False, init=False, default=None)
     
     # Campos opcionais ou com valor padrão (devem vir depois)
     password_changed_at: Mapped[datetime] = mapped_column(default=func.now())
@@ -53,7 +55,7 @@ class User:
 
 
 @table_registry.mapped_as_dataclass
-class Profile(Observable):
+class Profile:
     __tablename__ = 'profiles'
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
@@ -64,16 +66,12 @@ class Profile(Observable):
     details: Mapped[str] = mapped_column(nullable=True)
     user: Mapped["User"] = relationship("User", back_populates="profiles")
 
-    def __init__(self, *args, **kwargs):
-        Observable.__init__(self)
-        super(Profile, self).__init__(*args, **kwargs) 
-
     def get_age(self):
         """Calcula a idade do usuário conforme a data de nascimento."""
         today = date.today()
-        print(f'{self.data_nascimento}')
-        age = today.year - self.data_nascimento.year
-        if (today.month, today.day) < (self.data_nascimento.month, self.data_nascimento.day):
+        print(f'{self.birth_date}')
+        age = today.year - self.birth_date.year
+        if (today.month, today.day) < (self.birth_date.month, self.birth_date.day):
             age -= 1
         return age
     
@@ -83,11 +81,11 @@ class Profile(Observable):
     def update_weight(self, value):
         """Atualiza o valor do peso do usuário para value"""
         if value > 0:
-            self.peso = value
+            self.weight = value
             self.notify_observers()
         else:
             raise ValueError("O peso deve ser maior que zero!")
-        return self.peso
+        return self.weight
 
 
 @table_registry.mapped_as_dataclass
