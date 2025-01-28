@@ -2,18 +2,29 @@ from datetime import date
 
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import clear_mappers, sessionmaker
 
-from src.hidratatrack.models.models import Base, session, Profile, WaterIntake
-from src.hidratatrack.models.perfil import Profile
-from src.hidratatrack.models.user import AppUser
-from src.hidratatrack.models.water_tracker import WaterTracker
+from models.models import Profile, User, WaterIntake, table_registry, engine, session
+from models.water_tracker import WaterTracker
+
+
+@pytest.fixture(scope="function")
+def test_engine():
+    """Cria um banco de dados em memória para testes."""
+    test_engine = create_engine("sqlite:///:memory:")  # Banco em memória
+    table_registry.metadata.create_all(test_engine)  # Cria as tabelas
+    yield test_engine
+    test_engine.dispose()  # Fecha a conexão ao final dos testes
 
 
 @pytest.fixture
 def valid_user():
     """Fixture para criar um usuário válido."""
-    user = AppUser(login="valid_user", password="secure_password")
+    user = User(
+        login="valid_user",
+        email="valid@mail.com",
+        password="secure_password"
+        )
     return user
 
 
@@ -21,11 +32,11 @@ def valid_user():
 def profile():
     """Cria um usuário fictício para os testes."""
     return Profile(
-        nome="Felipe",
-        genero="Masculino",
-        data_nascimento=date(1993, 1, 1),
-        peso=80,
-        detalhes="Diabético"
+        name="Felipe",
+        gender="Masculino",
+        birth_date=date(1993, 1, 1),
+        weight=80,
+        details="Diabético"
     )
 
 
@@ -39,10 +50,10 @@ def setup_database():
     """Configuração inicial do banco para testes."""
     session.query(WaterIntake).delete()
     session.query(Profile).delete()
-    session.query(AppUser).delete()
+    session.query(User).delete()
     session.commit()
 
-    user = AppUser(login="testuser", password="testpass")
+    user = User(valid_user)
     session.add(user)
     session.commit()
 
@@ -60,15 +71,14 @@ def setup_database():
 
 
 @pytest.fixture(scope="function")
-def test_session():
-    """Configura um banco de dados SQLite temporário para os testes."""
-    engine = create_engine("sqlite:///:memory:")  # Banco de dados em memória
-    Base.metadata.create_all(engine)  # Cria todas as tabelas
+def test_session(test_engine):
+    """Cria uma sessão conectada ao banco de dados em memória."""
+    TestSession = sessionmaker(bind=test_engine)
+    session = TestSession()
 
-    Session = sessionmaker(bind=engine) # NoQA
-    session = Session()
+    # Fornece a sessão para o teste
+    yield session
 
-    yield session  # Fornece a sessão para os testes
-
-    session.close()  # Fecha a sessão após o teste
-    engine.dispose()  # Limpa o banco de dados
+    # Fecha a sessão e limpa os mapeamentos ao final
+    session.close()
+    clear_mappers()

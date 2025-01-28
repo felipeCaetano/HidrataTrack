@@ -2,10 +2,8 @@ from datetime import date
 from decimal import ROUND_UP, Decimal
 
 from kivy.core.window import Window
-from kivy.metrics import dp
 from kivymd.app import MDApp
 from kivymd.uix.pickers import MDDockedDatePicker
-from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
 from kivymd.utils.set_bars_colors import set_bars_colors
 from sqlalchemy import func
 
@@ -14,7 +12,9 @@ from models.water_tracker import WaterTracker
 from screens.createuserscreen.createuser import CreateUserScreen    # NoQA
 from screens.login.loginscreen import LoginScreen   # NoQA
 from screens.profile.createprofilescreen import CreateProfileScreen # NoQA
-from screens.trackerscreen.trackerscreen import TrackerScreen   # NoQA
+from screens.trackerscreen.trackerscreen import TrackerScreen
+from services.water_tracker_service import WaterIntakeService
+from utils.snackbar_utils import show_snackbar   # NoQA
 
 
 class MainApp(MDApp):
@@ -43,23 +43,23 @@ class MainApp(MDApp):
         """Salva um usuário no banco de dados."""
         existing_user = session.query(User).filter_by(login=user.login).first()
         if existing_user:
-            self.show_snackbar(f"Usuário {user.login} já existe.")
+            show_snackbar(f"Usuário {user.login} já existe.")
             return existing_user
         session.add(user)
         session.commit()
-        self.show_snackbar(f"Usuário {user.login} salvo com sucesso.")
+        show_snackbar(f"Usuário {user.login} salvo com sucesso.")
         return user
 
     def save_profile(self, profile: Profile):
         existing_profile = session.query(
             Profile).filter_by(name=profile.name).first()
         if existing_profile:
-            self.show_snackbar(f"Perfil {profile.name} já existe.")
+            show_snackbar(f"Perfil {profile.name} já existe.")
             return existing_profile
         self.user.profiles = profile
         session.add(profile)
         session.commit()
-        self.show_snackbar(f"Perfil {profile.name} salvo com sucesso.")
+        show_snackbar(f"Perfil {profile.name} salvo com sucesso.")
         return profile
 
     def show_date_picker(self, focus):
@@ -112,7 +112,7 @@ class MainApp(MDApp):
     def switch_to_tracker(self):
         """Switch to the tracker screen."""
         if not self.user:
-            self.show_snackbar("Por favor, crie um perfil antes.")
+            show_snackbar("Por favor, crie um perfil antes.")
             return
 
         self.water_tracker = WaterTracker()
@@ -130,32 +130,28 @@ class MainApp(MDApp):
 
     def add_water(self, amount):
         """Add water to the progress and update the tracker screen."""
-        if not hasattr(self, "water_tracker"):
-            self.water_tracker = WaterTracker()
-        if amount:
-            try:
-                self.water_tracker.add_water(float(amount))
-            except ValueError:
-                self.show_snackbar("Atenção! Entre com um número válido")
-        else:
-            self.show_snackbar("Atenção! O campo não pode ser vazio!")
-            return
-        if not self.user or not self.user.profiles:
-            print("Usuário ou perfil não encontrado.")
-            return
+        try:
+            if not self.water_tracker:
+                self.water_tracker = WaterTracker()
+            # Valida e salva consumo
+            self.water_tracker.add_water(amount)
+            WaterIntakeService(session).save_water_intake(self.user, amount)
 
-        self.save_water_intake(self.user, amount)
-        daily_total = self.load_daily_intake(self.user)
-        self.current_intake = self.water_tracker.current_intake
-        self.progress = self.water_tracker.get_progress()
+            # Atualiza progresso
+            daily_total = WaterIntakeService(session).load_daily_intake(self.user)
+            self.update_tracker_progress(daily_total)
+
+        except ValueError as e:
+            show_snackbar(str(e))
+
+    def update_tracker_progress(self, daily_total):
+        """Atualiza os componentes da interface com os dados mais recentes."""
         tracker_screen = self.root.get_screen("tracker")
-        tracker_screen.ids.water_add.text = ""
+        self.progress = self.water_tracker.get_progress()
         tracker_screen.ids.progress_bar.value = self.progress
-        tracker_screen.ids.progress_label.text = f"Progresso: {daily_total} ml"
+        tracker_screen.ids.water_add.text = ""
+        tracker_screen.ids.progress_label.text = f"Progresso: {daily_total} mL"
         tracker_screen.ids.bar_indicator.text = f"{self.progress} %"
-        print(
-            f"{amount} ml adicionados. Consumo diário total: {daily_total} ml."
-        )
 
     def switch_to_profile(self, user):
         """Switch to the profile screen."""
@@ -167,46 +163,35 @@ class MainApp(MDApp):
         new_weight = self.root.get_screen("settings").ids.new_weight.text
 
         if not new_weight or not self.user:
-            self.show_snackbar("Peso inválido ou perfil não criado.")
+            show_snackbar("Peso inválido ou perfil não criado.")
             return
 
         self.user["weight"] = float(new_weight)
         self.daily_goal = (float(new_weight) / 20) * 1000
         self.root.current = "menu"
 
-    def show_snackbar(self, msg):
-
-        MDSnackbar(
-            MDSnackbarText(
-                text=msg,
-            ),
-            y=dp(24),
-            pos_hint={"center_x": 0.5},
-            size_hint_x=0.8,
-        ).open()
-
     def show_water_history(self):
         """Exibe o histórico de consumo de água."""
         if not self.user:
-            self.show_snackbar("Usuário não encontrado.")
+            show_snackbar("Usuário não encontrado.")
             return
 
         history = self.load_water_history(self.user)
         for entry in history:
-            self.show_snackbar(
+            show_snackbar(
                 f"Data: {entry.date}, Quantidade: {entry.amount} ml")
 
     def save_water_intake(self, user, amount):
         """Registra o consumo de água para o usuário."""
         if not user:
-            self.show_snackbar(
+            show_snackbar(
                 "Usuário não encontrado para registrar o consumo.")
             return
 
         intake = WaterIntake(user_id=user.id, date=date.today(), amount=amount)
         session.add(intake)
         session.commit()
-        self.show_snackbar(
+        show_snackbar(
             f"{amount} ml de água registrados para o usuário {user.login}.")
         return intake
 
@@ -223,12 +208,12 @@ class MainApp(MDApp):
     def load_water_history(self, user):
         """Carrega o histórico completo de consumo de água do usuário."""
         if not user:
-            self.show_snackbar(
+            show_snackbar(
                 "Usuário não encontrado para carregar o histórico.")
             return []
 
         history = session.query(WaterIntake).filter_by(user_id=user.id).all()
-        self.show_snackbar(f"Histórico carregado para o usuário {user.login}.")
+        show_snackbar(f"Histórico carregado para o usuário {user.login}.")
         return history
 
 

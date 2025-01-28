@@ -1,4 +1,14 @@
 {
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}/src:${env:PYTHONPATH}"
+    },
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "${workspaceFolder}/src:${env:PYTHONPATH}"
+    },
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}/src;${env:PYTHONPATH}"
+    },
+    
     "python.analysis.extraPaths": [
         "./src/hidratatrack"
     ]

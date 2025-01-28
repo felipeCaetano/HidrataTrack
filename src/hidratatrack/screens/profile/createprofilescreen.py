@@ -3,7 +3,8 @@ from datetime import datetime
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.segmentedbutton import MDSegmentedButton
-from models.models import Profile  # NOQA
+from models.models import Profile
+from utils.snackbar_utils import show_snackbar  # NOQA
 
 
 class CreateProfileScreen(MDScreen):
@@ -13,7 +14,6 @@ class CreateProfileScreen(MDScreen):
 
     def create_profile(self):
         """Create a user profile and calculate the daily water goal."""
-
         user_name = self.ids.name.text.strip()
         birth_date = self.ids.birth_date.text
         user_weight = self.ids.weight.text
@@ -27,13 +27,13 @@ class CreateProfileScreen(MDScreen):
             gender = gender_selector.get_marked_items()[1]._label.text  # NOQA
 
         if not birth_date:
-            self.show_snackbar("Data de nascimento inválida")
+            show_snackbar("Data de nascimento inválida")
             return
         else:
             date_obj = datetime.strptime(birth_date, '%d/%m/%Y')
 
         if not all([user_name, user_weight, gender, date_obj]):
-            self.app.show_snackbar("Por favor, preencha todos os campos.")
+            show_snackbar("Por favor, preencha todos os campos.")
             return
 
         user_profile = Profile(user_id=self.app.user.id, name=user_name,

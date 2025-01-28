@@ -1,4 +1,4 @@
-from src.hidratatrack.models.models import Profile
+from models.models import Profile
 
 
 class AppUser:

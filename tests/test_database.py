@@ -1,6 +1,6 @@
 import pytest
 from datetime import date
-from src.hidratatrack.models.models import session, User, Profile, WaterIntake
+from models.models import session, User, Profile, WaterIntake
 
 
 def test_user_creation(setup_database):

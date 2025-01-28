@@ -1,6 +1,6 @@
 import pytest
-from src.hidratatrack.models.user import AppUser
-from src.hidratatrack.models.water_tracker import WaterTracker
+from models.models import User
+from models.water_tracker import WaterTracker
 
 
 def test_user_creation(valid_user):
@@ -29,7 +29,7 @@ def test_update_password(valid_user):
 def test_authenticate_user_success():
     """Testa a autenticação com credenciais válidas."""
     login, password = "valid_user", "secure_password"
-    user = AppUser(login=login, password=password)
+    user = User(login=login, password=password)
     assert user.login == login
     assert user.password == password
 

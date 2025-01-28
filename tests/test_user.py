@@ -1,15 +1,15 @@
 import pytest
 
-from src.hidratatrack.models.water_tracker import WaterTracker
+from models.water_tracker import WaterTracker
 
 
 def test_user_creation(profile):
     """Testa se o usuário é criado corretamente."""
-    assert profile.nome == "Felipe"
-    assert profile.genero == "Masculino"
-    assert profile.idade == 32
-    assert profile.peso == 80
-    assert profile.detalhes == "Diabético"
+    assert profile.name == "Felipe"
+    assert profile.gender == "Masculino"
+    assert profile.birth_date == 32
+    assert profile.weight == 80
+    assert profile.details == "Diabético"
 
 
 def test_custom_goal_recalculation(profile):
@@ -22,7 +22,7 @@ def test_custom_goal_recalculation(profile):
 def test_update_weight(profile):
     """Testa a atualização do peso do usuário."""
     profile.update_weight(70)
-    assert profile.peso == 70
+    assert profile.weight == 70
 
     # Testa peso inválido
     with pytest.raises(ValueError):
@@ -31,7 +31,7 @@ def test_update_weight(profile):
 
 def test_weight_update_recalculates_goal(profile):
     """Testa se a atualização do peso recalcula a meta no tracker."""
-    tracker = WaterTracker(profile)
+    tracker = WaterTracker()
     assert tracker.daily_goal == 4000  # 80kg -> 4L
 
     profile.update_weight(60)  # Atualiza o peso

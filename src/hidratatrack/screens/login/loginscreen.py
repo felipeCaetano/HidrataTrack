@@ -4,6 +4,8 @@ from models.models import session, User  # NoQA
 from models.security import hash_password  # NoQA
 from sqlalchemy.exc import SQLAlchemyError
 
+from utils.snackbar_utils import show_snackbar
+
 
 class LoginScreen(MDScreen):
     def __init__(self, **kwargs):
@@ -13,14 +15,14 @@ class LoginScreen(MDScreen):
     def _validate_inputs(self, login, password):
         """Valida os campos de entrada antes de tentar autenticar"""
         if not login or not password:
-            self.app.show_snackbar("Por favor, preencha todos os campos.")
+            show_snackbar("Por favor, preencha todos os campos.")
             return False
         return True
 
     def _handle_successful_login(self, user):
         """Gerencia o fluxo após um login bem-sucedido"""
         self.app.user = user
-        self.app.show_snackbar(f"Bem-vindo(a), {user.login}!")
+        show_snackbar(f"Bem-vindo(a), {user.login}!")
 
         self.ids.password.text = ""
 
@@ -38,13 +40,11 @@ class LoginScreen(MDScreen):
             if user and user.password == hash_password(password):
                 self._handle_successful_login(user)
             else:
-                self.app.show_snackbar("Login ou senha inválidos.")
+                show_snackbar("Login ou senha inválidos.")
         except SQLAlchemyError as db_error:
-            self.app.show_snackbar(
+            show_snackbar(
                 "Erro ao conectar com o banco de dados. Tente novamente.")
             print(f"Erro de banco de dados: {str(db_error)}")
         except Exception as e:
-           self.app.show_snackbar(
-               "Ocorreu um erro inesperado. Tente novamente."
-           )
-           print(f"Erro inesperado: {str(e)}")
+            show_snackbar("Ocorreu um erro inesperado. Tente novamente.")
+            print(f"Erro inesperado: {str(e)}")

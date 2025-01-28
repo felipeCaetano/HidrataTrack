@@ -1,5 +1,7 @@
 from kivymd.app import MDApp
 
+from utils.snackbar_utils import show_snackbar
+
 
 class WaterTracker:
     def __init__(self):
@@ -22,15 +24,14 @@ class WaterTracker:
 
     def add_water(self, water_volume: float):
         if water_volume <= 0:
-            self.app.show_snackbar(
+            show_snackbar(
                 "ALERTA! Quantidade de água deve ser maior que zero.")
             return
 
         self.current_intake += water_volume
         if self.current_intake > self.app.daily_goal:
             self.current_intake = self.app.daily_goal
-            self.app.show_snackbar(
-                "ALERTA! Você ultrapassou o consumo diário!")
+            show_snackbar("ALERTA! Você ultrapassou o consumo diário!")
 
     def reset(self):
         self.current_intake = 0

@@ -1,7 +1,7 @@
 import pytest
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
-from src.hidratatrack.main import MainApp  # Substitua com o nome correto do arquivo.
+from main import MainApp  # Substitua com o nome correto do arquivo.
 
 class TestHidrataTrackApp:
 

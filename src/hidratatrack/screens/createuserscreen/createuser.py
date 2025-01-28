@@ -3,7 +3,8 @@ from kivymd.uix.screen import MDScreen
 
 from models.security import hash_password  # NoQA
 
-from src.hidratatrack.models.models import User
+from models.models import User
+from utils.snackbar_utils import show_snackbar
 
 
 class CreateUserScreen(MDScreen):
@@ -17,7 +18,7 @@ class CreateUserScreen(MDScreen):
         email = self.ids.email.text
         senha = self.ids.password.text
         if not all([user_name, email, senha]):
-            self.app.show_snackbar("Por favor, preencha todos os campos.")
+            show_snackbar("Por favor, preencha todos os campos.")
             return
         hashed_password = hash_password(senha)
         self.user = User(user_name, email, hashed_password)
