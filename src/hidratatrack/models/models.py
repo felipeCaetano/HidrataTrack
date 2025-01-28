@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from typing import Optional
+from typing import List
 
 from sqlalchemy import create_engine, ForeignKey, func
 from sqlalchemy.orm import (Mapped, mapped_column, registry, relationship,
@@ -41,9 +41,9 @@ class User:
     login: Mapped[str] = mapped_column(unique=True, nullable=False)
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
-    profiles: Optional[Mapped["Profile"]] = relationship(
-        "Profile", back_populates="user", uselist=False, init=False,
-        default=None)
+    profiles: Mapped[List["Profile"]] = relationship(
+        "Profile", back_populates="user", uselist=True, init=False,
+        cascade="all, delete-orphan", default_factory=list)
     password_changed_at: Mapped[datetime] = mapped_column(default=func.now())
     # last_failed_login: Mapped[datetime] = mapped_column(nullable=True)
     # failed_login_attempts: Mapped[int] = mapped_column(default=0)
