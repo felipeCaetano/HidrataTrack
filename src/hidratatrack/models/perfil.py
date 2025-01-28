@@ -2,7 +2,10 @@ from datetime import date
 
 
 class Profile:
-    def __init__(self, nome=None, genero=None, data_nascimento=None, peso=None, detalhes=None):
+    def __init__(
+            self,
+            nome=None,
+            genero=None, data_nascimento=None, peso=None, detalhes=None):
         self.name = nome
         self.genero = genero
         self.data_nascimento = data_nascimento
@@ -26,7 +29,8 @@ class Profile:
         today = date.today()
         print(f'{self.data_nascimento}')
         age = today.year - self.data_nascimento.year
-        if (today.month, today.day) < (self.data_nascimento.month, self.data_nascimento.day):
+        if (today.month, today.day) < (
+                self.data_nascimento.month, self.data_nascimento.day):
             age -= 1
         return age
     
@@ -41,10 +45,3 @@ class Profile:
         else:
             raise ValueError("O peso deve ser maior que zero!")
         return self.peso
-     # type: ignore
-    
-    @staticmethod
-    def create_profile(name, weight):
-        return Profile(
-            name=name, genero="Seu genero", data_nascimento=date(1993, 1, 1), peso=weight, detalhes="Nenhum"
-            )

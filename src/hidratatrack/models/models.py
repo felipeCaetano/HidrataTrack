@@ -1,11 +1,9 @@
 from datetime import datetime, date
-from sqlalchemy import (
-    DateTime, create_engine, Column, Integer, String, Date, ForeignKey, Float,
-    func
-    )
-from sqlalchemy.orm import Mapped, mapped_column, registry, relationship, sessionmaker
 from typing import Optional
 
+from sqlalchemy import create_engine, ForeignKey, func
+from sqlalchemy.orm import (Mapped, mapped_column, registry, relationship,
+                            sessionmaker)
 
 # Configuração do mapeamento e do banco de dados
 table_registry = registry()
@@ -13,6 +11,7 @@ DATABASE_URL = "sqlite:///hydratrack.db"
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 session = Session()
+
 
 class Observable:
     def __init__(self):
@@ -30,9 +29,8 @@ class Observable:
 
     def notify_observers(self, *args, **kwargs):
         """Notifica todos os observadores sobre uma mudança."""
-        for observer in self._observers:
+        for observer in self.observers:
             observer(*args, **kwargs)
-
 
 
 # Classes mapeadas como dataclasses
@@ -44,13 +42,12 @@ class User:
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     profiles: Optional[Mapped["Profile"]] = relationship(
-        "Profile", back_populates="user", uselist=False, init=False, default=None)
-    
-    # Campos opcionais ou com valor padrão (devem vir depois)
+        "Profile", back_populates="user", uselist=False, init=False,
+        default=None)
     password_changed_at: Mapped[datetime] = mapped_column(default=func.now())
     # last_failed_login: Mapped[datetime] = mapped_column(nullable=True)
     # failed_login_attempts: Mapped[int] = mapped_column(default=0)
-    
+
     BCRYPT_WORK_FACTOR = 12
 
 
@@ -71,13 +68,14 @@ class Profile:
         today = date.today()
         print(f'{self.birth_date}')
         age = today.year - self.birth_date.year
-        if (today.month, today.day) < (self.birth_date.month, self.birth_date.day):
+        if (today.month, today.day) < (
+                self.birth_date.month, self.birth_date.day):
             age -= 1
         return age
-    
+
     def calculate_goal(self, peso):
         return (float(peso) / 20) * 1000
-    
+
     def update_weight(self, value):
         """Atualiza o valor do peso do usuário para value"""
         if value > 0:
@@ -86,6 +84,9 @@ class Profile:
         else:
             raise ValueError("O peso deve ser maior que zero!")
         return self.weight
+
+    def notify_observers(self):
+        pass
 
 
 @table_registry.mapped_as_dataclass
