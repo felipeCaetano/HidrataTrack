@@ -12,7 +12,7 @@ from models.water_tracker import WaterTracker
 from screens.createuserscreen.createuser import CreateUserScreen    # NoQA
 from screens.login.loginscreen import LoginScreen   # NoQA
 from screens.profile.createprofilescreen import CreateProfileScreen # NoQA
-from screens.trackerscreen.trackerscreen import TrackerScreen
+from screens.trackerscreen.trackerscreen import TrackerScreen   # NoQA
 from services.water_tracker_service import WaterIntakeService
 from utils.snackbar_utils import show_snackbar   # NoQA
 

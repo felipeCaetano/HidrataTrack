@@ -12,12 +12,13 @@ class WaterTracker:
             self.app.progress = self.get_progress()
         else:
             print("Sem perfil?")
+            self.current_intake = 0
             self.app.daily_goal = 0
 
     def calculate_daily_goal(self):
         if self.app.user and self.app.user.profiles:
-            return self.app.user.profiles.calculate_goal(
-                self.app.user.profiles.weight)
+            return self.app.user.profiles[0].calculate_goal(
+                self.app.user.profiles[0].weight)
         else:
             print("sem perfl?")
             return 0

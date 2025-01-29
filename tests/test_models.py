@@ -1,4 +1,6 @@
 from datetime import datetime
+from pprint import pprint
+
 import pytest
 
 # from models.water_tracker import WaterTracker
@@ -37,11 +39,13 @@ import pytest
 
 #     profile.update_weight(60)  # Atualiza o peso
 #     assert tracker.daily_goal == 3000  # 60kg -> 3L
-from models.models import Profile, User
+from models.models import Profile, User, WaterIntake
+
 
 def test_user_creation(test_session):
     """Testa a criação de um usuário."""
-    user = User(login="testuser", email="test@example.com", password="securepass")
+    user = User(login="testuser", email="test@example.com",
+                password="securepass")
     test_session.add(user)
     test_session.commit()
 
@@ -49,22 +53,23 @@ def test_user_creation(test_session):
     assert stored_user is not None
     assert stored_user.email == "test@example.com"
 
+
 def test_profile_creation(valid_user):
-   
     stored_user = valid_user
     profile = Profile(
         user_id=valid_user.id, name='Felipe',
-        birth_date=datetime(1990, 1, 1), 
+        birth_date=datetime(1990, 1, 1),
         gender='Masculino', weight=80,
         details="", user=stored_user)
     assert profile is not None
     assert profile.user.email == "valid@mail.com"
 
+
 def test_profile_save(valid_user, test_session):
     stored_user = valid_user
     profile = Profile(
         user_id=valid_user.id, name='Felipe',
-        birth_date=datetime(1990, 1, 1), 
+        birth_date=datetime(1990, 1, 1),
         gender='Masculino', weight=80,
         details="", user=stored_user)
     test_session.add(profile)
@@ -73,7 +78,8 @@ def test_profile_save(valid_user, test_session):
     assert len(user.profiles) == 1
     assert user.profiles[0].name == "Felipe"
 
-def test_user_with_profiles(test_session,valid_user, profile):
+
+def test_user_with_profiles(test_session, valid_user, profile):
     """Testa associar múltiplos perfis a um usuário."""
     # Cria perfis associados ao usuário
     profile1 = profile
@@ -91,17 +97,20 @@ def test_user_with_profiles(test_session,valid_user, profile):
     assert user.profiles[0].name == "Felipe"
     assert user.profiles[1].name == "Miguel"
 
+
 def test_profile_age_calculation(profile):
     """Testa o cálculo da idade do perfil."""
     assert profile.get_age() == 32
+
 
 def test_profile_calculate_goal(profile):
     """Testa o cálculo da meta diária de água."""
     assert profile.calculate_goal(80) == 4000  # 80kg -> 4L
 
+
 def test_profile_update_weight(profile):
     """Testa a atualização do peso do perfil."""
-    
+
     profile.update_weight(70)
     assert profile.weight == 70
 
@@ -109,3 +118,75 @@ def test_profile_update_weight(profile):
     with pytest.raises(ValueError):
         profile.update_weight(-10)
 
+
+def test_water_intake_creation(test_session, valid_user):
+    """Testa a criação de um registro de ingestão de água."""
+    # Cria um registro de ingestão de água
+    water_intake = WaterIntake(
+        user_id=valid_user.id,
+        date=datetime(2023, 10, 1),
+        amount=500.0
+    )
+    test_session.add(water_intake)
+    test_session.commit()
+
+    # Verifica se o registro foi salvo corretamente
+    stored_intake = test_session.query(WaterIntake).filter_by(
+        user_id=valid_user.id).first()
+    assert stored_intake is not None
+    assert stored_intake.amount == 500.0
+    assert stored_intake.date == datetime(2023, 10, 1)
+
+
+def test_water_intake_user_association(test_session, valid_user):
+    """Testa a associação de um registro de ingestão de água com um usuário."""
+    # Cria um registro de ingestão de água
+    water_intake = WaterIntake(
+        user_id=valid_user.id,
+        date=datetime(2023, 10, 1),
+        amount=500.0
+    )
+    test_session.add(water_intake)
+    test_session.commit()
+
+    # Verifica se o registro está associado ao usuário correto
+    user = test_session.query(User).filter_by(id=valid_user.id).first()
+    assert len(user.water_intakes) == 1
+    assert user.water_intakes[0].amount == 500.0
+
+
+def test_multiple_water_intakes(test_session, valid_user):
+    """Testa a criação de múltiplos registros de ingestão de água
+    para um usuário."""
+    # Cria dois registros de ingestão de água
+    water_intake1 = WaterIntake(
+        user_id=valid_user.id,
+        date=datetime(2023, 10, 1),
+        amount=500.0
+    )
+    water_intake2 = WaterIntake(
+        user_id=valid_user.id,
+        date=datetime(2023, 10, 2),
+        amount=1000.0
+    )
+    test_session.add(water_intake1)
+    test_session.add(water_intake2)
+    test_session.commit()
+
+    # Verifica se os registros foram salvos e associados ao usuário
+    water_intakes = test_session.query(WaterIntake).all()
+    assert len(water_intakes) == 2
+    assert water_intakes[0].amount == 500.0
+    assert water_intakes[1].amount == 1000.0
+
+
+def test_water_intake_negative_amount(test_session, valid_user):
+    """Testa se um valor negativo para amount lança uma exceção."""
+    with pytest.raises(ValueError):
+        water_intake = WaterIntake(
+            user_id=valid_user.id,
+            date=datetime(2023, 10, 1),
+            amount=-500.0  # Valor negativo deve lançar uma exceção
+        )
+        test_session.add(water_intake)
+        test_session.commit()

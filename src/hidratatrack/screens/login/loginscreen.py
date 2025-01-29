@@ -1,3 +1,6 @@
+import time
+from pprint import pprint
+
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from models.models import session, User  # NoQA
@@ -23,7 +26,6 @@ class LoginScreen(MDScreen):
         """Gerencia o fluxo após um login bem-sucedido"""
         self.app.user = user
         show_snackbar(f"Bem-vindo(a), {user.login}!")
-
         self.ids.password.text = ""
 
         self.app.switch_to_profile(user) if user.profiles is None \
@@ -37,6 +39,7 @@ class LoginScreen(MDScreen):
             if not self._validate_inputs(login, password):
                 return
             user = session.query(User).filter_by(login=login).first()
+            pprint(user.login)
             if user and user.password == hash_password(password):
                 self._handle_successful_login(user)
             else:

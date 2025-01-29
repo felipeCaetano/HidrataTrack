@@ -6,7 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import clear_mappers, sessionmaker
 
 from main import MainApp
-from models.models import Profile, User, WaterIntake, table_registry, engine, session
+from models.models import (Profile, User, WaterIntake, table_registry,
+                           engine, session)
 from models.water_tracker import WaterTracker
 from utils.snackbar_utils import show_snackbar
 
@@ -27,7 +28,7 @@ def valid_user(test_session):
         login="valid_user",
         email="valid@mail.com",
         password="secure_password"
-        )
+    )
     test_session.add(user)
     test_session.commit()
     return user
@@ -109,11 +110,11 @@ def test_session(test_engine):
 # def app(mocker, mock_screen):
 #     """Instância do aplicativo com serviços simulados."""
 #     app = MainApp()
-    
+
 #     # Mock the screen manager and screens
 #     app.root = MagicMock()
 #     # app.sm = app.root  # Assuming sm is an alias for root in your app
-    
+
 #     # Set up the mock screens
 #     screens = {
 #         'login': mock_screen,
@@ -121,6 +122,6 @@ def test_session(test_engine):
 #         'tracker': mock_screen
 #     }
 #     app.root.get_screen.side_effect = lambda name: screens[name]
-    
+
 #     mocker.patch("utils.snackbar_utils.show_snackbar", side_effect=show_snackbar)
 #     return app
