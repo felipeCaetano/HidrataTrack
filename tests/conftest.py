@@ -1,15 +1,11 @@
-from datetime import date
+from datetime import date, datetime
 from unittest.mock import MagicMock
-
+from kivymd.app import MDApp
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import clear_mappers, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
-from main import MainApp
-from models.models import (Profile, User, WaterIntake, table_registry,
-                           engine, session)
-from services.water_tracker import WaterTracker
-from utils.snackbar_utils import show_snackbar
+from models.models import (Profile, User, table_registry)
 
 
 @pytest.fixture
@@ -49,34 +45,38 @@ def profile(valid_user):
     return profile
 
 
-# @pytest.fixture
-# def tracker():
-#     return WaterTracker()
+@pytest.fixture
+def user_with_profile():
+    user = User(login="testuser", email="test@example.com", password="securepass")
+    profile = Profile(
+        user_id=user.id,
+        name="Felipe",
+        birth_date=datetime(1990, 1, 1),
+        gender="Masculino",
+        weight=80,
+        details="Teste",
+        user=user
+    )
+    user.profiles = [profile]
+    return user
 
 
-# # @pytest.fixture
-# # def setup_database():
-# #     """Configuração inicial do banco para testes."""
-# #     session.query(WaterIntake).delete()
-# #     session.query(Profile).delete()
-# #     session.query(User).delete()
-# #     session.commit()
+# Mock do MDApp
+@pytest.fixture
+def mock_app():
+    mock_app = MagicMock()
+    mock_app.user = None
+    mock_app.daily_goal = 0
+    mock_app.progress = 0
+    return mock_app
 
-# #     user = User(valid_user)
-# #     session.add(user)
-# #     session.commit()
 
-# #     profile = Profile(
-# #         user_id=user.id,
-# #         name="Test User",
-# #         birth_date=date(1990, 1, 1),
-# #         weight=70.0,
-# #         details="Teste"
-# #     )
-# #     session.add(profile)
-# #     session.commit()
-
-# #     return user, profile
+@pytest.fixture(autouse=True)
+def mock_kivymd(mocker):
+    """Configura o mock do KivyMD para todos os testes."""
+    mock_app = MagicMock()
+    mocker.patch.object(MDApp, 'get_running_app', return_value=mock_app)
+    return mock_app
 
 
 @pytest.fixture()
