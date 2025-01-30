@@ -62,6 +62,9 @@ class Profile:
     weight: Mapped[float]
     details: Mapped[str] = mapped_column(nullable=True)
     user: Mapped["User"] = relationship("User", back_populates="profiles")
+    water_intakes: Mapped[List["WaterIntake"]] = relationship(
+        "WaterIntake", back_populates="profile", uselist=True, init=False,
+        cascade="all, delete-orphan", default_factory=list)
 
     def get_age(self):
         """Calcula a idade do usuário conforme a data de nascimento."""
@@ -93,9 +96,15 @@ class Profile:
 class WaterIntake:
     __tablename__ = 'water_intakes'
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    profile_id: Mapped[int] = mapped_column(ForeignKey('profiles.id'))
     date: Mapped[datetime] = mapped_column(nullable=False)
     amount: Mapped[float] = mapped_column(nullable=False)
+    profile: Mapped["Profile"] = relationship("Profile", back_populates="water_intakes")
+
+    def __post_init__(self):
+        """Valida o valor de amount ao criar um objeto WaterIntake."""
+        if self.amount <= 0:
+            raise ValueError("A quantidade de água deve ser maior que zero.")
 
 
 # Criar as tabelas

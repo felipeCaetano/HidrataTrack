@@ -1,13 +1,4 @@
-# import pytest
-# from models.models import User
 # from models.water_tracker import WaterTracker
-
-
-# def test_user_creation(valid_user):
-#     """Testa se o usuário é criado corretamente."""
-#     assert valid_user.login == "valid_user"
-#     assert valid_user.password == "secure_password"
-#     assert valid_user.profile is None
 
 # # def test_user_set_profile(valid_user):
 # #     """Testa se o perfil do usuário é configurado corretamente."""

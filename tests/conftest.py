@@ -8,7 +8,7 @@ from sqlalchemy.orm import clear_mappers, sessionmaker
 from main import MainApp
 from models.models import (Profile, User, WaterIntake, table_registry,
                            engine, session)
-from models.water_tracker import WaterTracker
+from services.water_tracker import WaterTracker
 from utils.snackbar_utils import show_snackbar
 
 

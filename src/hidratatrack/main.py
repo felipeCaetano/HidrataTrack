@@ -8,7 +8,7 @@ from kivymd.utils.set_bars_colors import set_bars_colors
 from sqlalchemy import func
 
 from models.models import Profile, User, WaterIntake, session
-from models.water_tracker import WaterTracker
+from services.water_tracker import WaterTracker
 from screens.createuserscreen.createuser import CreateUserScreen    # NoQA
 from screens.login.loginscreen import LoginScreen   # NoQA
 from screens.profile.createprofilescreen import CreateProfileScreen # NoQA
