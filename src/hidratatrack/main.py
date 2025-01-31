@@ -7,7 +7,7 @@ from kivymd.uix.pickers import MDDockedDatePicker
 from kivymd.utils.set_bars_colors import set_bars_colors
 from sqlalchemy import func
 
-from models.models import Profile, User, WaterIntake, session
+from models.models import WaterIntake, session
 from services.water_tracker import WaterTracker
 from screens.createuserscreen.createuser import CreateUserScreen    # NoQA
 from screens.login.loginscreen import LoginScreen   # NoQA
@@ -38,29 +38,6 @@ class MainApp(MDApp):
             self.theme_cls.primary_palette,  # navigation bar color
             "Light",  # icons color of status bar
         )
-
-    def save_user(self, user: User):
-        """Salva um usuário no banco de dados."""
-        existing_user = session.query(User).filter_by(login=user.login).first()
-        if existing_user:
-            show_snackbar(f"Usuário {user.login} já existe.")
-            return existing_user
-        session.add(user)
-        session.commit()
-        show_snackbar(f"Usuário {user.login} salvo com sucesso.")
-        return user
-
-    def save_profile(self, profile: Profile):
-        existing_profile = session.query(
-            Profile).filter_by(name=profile.name).first()
-        if existing_profile:
-            show_snackbar(f"Perfil {profile.name} já existe.")
-            return existing_profile
-        self.user.profiles = profile
-        session.add(profile)
-        session.commit()
-        show_snackbar(f"Perfil {profile.name} salvo com sucesso.")
-        return profile
 
     def show_date_picker(self, focus):
         if not focus:

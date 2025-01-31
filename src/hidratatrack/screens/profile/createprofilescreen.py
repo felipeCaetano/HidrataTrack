@@ -3,8 +3,10 @@ from datetime import datetime
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.segmentedbutton import MDSegmentedButton
-from models.models import Profile
+from services.profile_service import create_profile, save_profile
 from utils.snackbar_utils import show_snackbar  # NOQA
+
+from src.hidratatrack.models.models import session
 
 
 class CreateProfileScreen(MDScreen):
@@ -14,9 +16,9 @@ class CreateProfileScreen(MDScreen):
 
     def create_profile(self):
         """Create a user profile and calculate the daily water goal."""
-        user_name = self.ids.name.text.strip()
+        profile_name = self.ids.name.text.strip()
         birth_date = self.ids.birth_date.text
-        user_weight = self.ids.weight.text
+        profile_weight = self.ids.weight.text
         gender_selector: MDSegmentedButton = self.ids.gender_select
         details = self.ids.details.text
         try:
@@ -32,18 +34,12 @@ class CreateProfileScreen(MDScreen):
         else:
             date_obj = datetime.strptime(birth_date, '%d/%m/%Y')
 
-        if not all([user_name, user_weight, gender, date_obj]):
-            show_snackbar("Por favor, preencha todos os campos.")
-            return
-
-        user_profile = Profile(user_id=self.app.user.id, name=user_name,
-                               gender=gender, birth_date=date_obj,
-                               weight=user_weight, details=details,
-                               user=self.app.user)
+        user_profile = create_profile(self.app.user, profile_name,  date_obj,
+                                      profile_weight, gender, details)
 
         self.app.user.profile = user_profile
         self.app.daily_goal = self.app.user.profile.calculate_goal(
             user_profile.weight)
         if self.app.user.profile is not None:
-            self.app.save_profile(user_profile)
+            save_profile(self.app.user, user_profile, session)
             self.app.switch_to_tracker()

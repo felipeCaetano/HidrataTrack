@@ -6,6 +6,8 @@ import pytest
 # from models.water_tracker import WaterTracker
 
 from models.models import Profile, User, WaterIntake
+from datetime import datetime, date
+from models.models import Profile
 
 
 def test_user_creation(valid_user):
@@ -31,6 +33,17 @@ def test_profile_age_calculation(profile):
     assert profile.get_age() == 32
 
 
+
+def test_get_age_before_birthday(profile):
+    """Testa se get_age() subtrai corretamente 1 ano quando o aniversário ainda
+    não passou."""
+    today = date.today()
+    # Criamos um perfil com data de nascimento futura no ano atual
+    profile.birth_date = date(1990, 3, 30)
+
+    assert profile.get_age() == today.year - profile.birth_date.year - 1  # Deve subtrair 1
+
+
 def test_profile_calculate_goal(profile):
     """Testa o cálculo da meta diária de água."""
     assert profile.calculate_goal(80) == 4000  # 80kg -> 4L
@@ -54,4 +67,3 @@ def test_water_intake_negative_amount(profile):
             profile_id=1,
             date=datetime(2024, 1, 1),
             amount=-500, profile=profile)
-        

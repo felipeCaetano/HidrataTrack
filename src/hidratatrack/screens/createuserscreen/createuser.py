@@ -1,9 +1,8 @@
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
-
-from models.security import hash_password  # NoQA
-
-from models.models import User
+from models.models import session
+ # NoQA
+from services.user_service import create_user, save_user
 from utils.snackbar_utils import show_snackbar
 
 
@@ -20,10 +19,9 @@ class CreateUserScreen(MDScreen):
         if not all([user_name, email, senha]):
             show_snackbar("Por favor, preencha todos os campos.")
             return
-        hashed_password = hash_password(senha)
-        self.user = User(user_name, email, hashed_password)
+        self.user = create_user(user_name, email, senha)
         self.clear_fields()
-        user_db = self.app.save_user(self.user)
+        user_db = save_user(self.user, session)
         if user_db:
             self.switch_to_login()
 

@@ -13,24 +13,24 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-class Observable:
-    def __init__(self):
-        self.observers = []
-
-    def add_observer(self, observer):
-        """Adiciona um novo observador."""
-        if self.observers is None:
-            self.observers = []
-        self.observers.append(observer)
-
-    def remove_observer(self, observer):
-        """Remove um observador existente."""
-        self.observers.remove(observer)
-
-    def notify_observers(self, *args, **kwargs):
-        """Notifica todos os observadores sobre uma mudança."""
-        for observer in self.observers:
-            observer(*args, **kwargs)
+# class Observable:
+#     def __init__(self):
+#         self.observers = []
+#
+#     def add_observer(self, observer):
+#         """Adiciona um novo observador."""
+#         if self.observers is None:
+#             self.observers = []
+#         self.observers.append(observer)
+#
+#     def remove_observer(self, observer):
+#         """Remove um observador existente."""
+#         self.observers.remove(observer)
+#
+#     def notify_observers(self, *args, **kwargs):
+#         """Notifica todos os observadores sobre uma mudança."""
+#         for observer in self.observers:
+#             observer(*args, **kwargs)
 
 
 # Classes mapeadas como dataclasses
