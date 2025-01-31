@@ -16,12 +16,9 @@ class CreateUserScreen(MDScreen):
         user_name = self.ids.login.text
         email = self.ids.email.text
         senha = self.ids.password.text
-        if not all([user_name, email, senha]):
-            show_snackbar("Por favor, preencha todos os campos.")
-            return
         self.user = create_user(user_name, email, senha)
         self.clear_fields()
-        user_db = save_user(self.user, session)
+        user_db = save_user(self.user)
         if user_db:
             self.switch_to_login()
 

@@ -5,7 +5,7 @@ from models.security import hash_password
 
 user_events = EventEmitter()
 
-def create_user(name, email, password, session):
+def create_user(name, email, password):
     if not all([name, email, password]):
         user_events.emit("User-warning","Por favor, preencha todos os campos.")
         return
@@ -27,11 +27,10 @@ def get_user(identifier, session: Session):
     return user_db
 
 
-def save_user(user: User, session):
+def save_user(user: User):
     """Salva um usuário no banco de dados.
 
     :param user: Objeto do tipo User
-    :param session: Sessão do banco de dados.
     :return: Usuário criado.
     """
     existing_user = session.query(User).filter_by(login=user.login).first()

@@ -35,11 +35,11 @@ class CreateProfileScreen(MDScreen):
             date_obj = datetime.strptime(birth_date, '%d/%m/%Y')
 
         user_profile = create_profile(self.app.user, profile_name,  date_obj,
-                                      profile_weight, gender, details)
+                                       gender, profile_weight, details)
 
-        self.app.user.profile = user_profile
-        self.app.daily_goal = self.app.user.profile.calculate_goal(
+        self.app.user.profiles.append(user_profile)
+        self.app.daily_goal = self.app.user.profiles[0].calculate_goal(
             user_profile.weight)
-        if self.app.user.profile is not None:
-            save_profile(self.app.user, user_profile, session)
+        if self.app.user.profiles is not None:
+            profile = save_profile(self.app.user, user_profile)
             self.app.switch_to_tracker()

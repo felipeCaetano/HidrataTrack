@@ -57,3 +57,4 @@ def test_save_profile(test_session, valid_user):
     assert profile_db is not None
     assert profile_db.name == "Felipe"
     assert profile_db.weight == 80
+    assert profile_db.user_id == valid_user.id

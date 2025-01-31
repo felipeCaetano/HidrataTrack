@@ -106,29 +106,14 @@ class MainApp(MDApp):
         self.root.current = "tracker"
 
     def add_water(self, amount):
-        """Add water to the progress and update the tracker screen."""
-        try:
-            if not self.water_tracker:
-                self.water_tracker = WaterTracker()
-            # Valida e salva consumo
-            self.water_tracker.add_water(amount)
-            WaterIntakeService(session).save_water_intake(self.user, amount)
-
-            # Atualiza progresso
-            daily_total = WaterIntakeService(session).load_daily_intake(self.user)
-            self.update_tracker_progress(daily_total)
-
-        except ValueError as e:
-            show_snackbar(str(e))
-
-    def update_tracker_progress(self, daily_total):
-        """Atualiza os componentes da interface com os dados mais recentes."""
+        """Encaminha a adição de água para a TrackerScreen."""
         tracker_screen = self.root.get_screen("tracker")
-        self.progress = self.water_tracker.get_progress()
-        tracker_screen.ids.progress_bar.value = self.progress
-        tracker_screen.ids.water_add.text = ""
-        tracker_screen.ids.progress_label.text = f"Progresso: {daily_total} mL"
-        tracker_screen.ids.bar_indicator.text = f"{self.progress} %"
+        try:
+            amount = float(amount)
+        except Exception:
+            show_snackbar("Erro no valor")
+        tracker_screen.add_water(amount, self.user, session)
+
 
     def switch_to_profile(self, user):
         """Switch to the profile screen."""

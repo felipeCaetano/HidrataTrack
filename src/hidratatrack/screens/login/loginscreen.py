@@ -28,7 +28,7 @@ class LoginScreen(MDScreen):
         show_snackbar(f"Bem-vindo(a), {user.login}!")
         self.ids.password.text = ""
 
-        self.app.switch_to_profile(user) if user.profiles is None \
+        self.app.switch_to_profile(user) if user.profiles == [] \
             else self.app.switch_to_tracker()
 
     def authenticate_user(self):
@@ -39,7 +39,6 @@ class LoginScreen(MDScreen):
             if not self._validate_inputs(login, password):
                 return
             user = session.query(User).filter_by(login=login).first()
-            pprint(user.login)
             if user and user.password == hash_password(password):
                 self._handle_successful_login(user)
             else:

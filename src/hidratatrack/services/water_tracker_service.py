@@ -17,7 +17,8 @@ class WaterIntakeService:
             raise ValueError("Quantidade de água deve ser maior que zero.")
         
         intake = WaterIntake(
-            user_id=user.id, date=date.today(), amount=amount
+            profile_id=user.profiles[0].id, date=date.today(), amount=amount,
+            profile=user.profiles[0]
             )
         self.session.add(intake)
         self.session.commit()
