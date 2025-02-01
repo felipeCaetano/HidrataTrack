@@ -34,5 +34,4 @@ jobs:
       
       - name: Run Tests with Debug
         run: |
-          set -x  # Habilita o modo de debug do bash
-          python -m pytest -v tests/
+          python -X faulthandler -m pytest -v tests/
