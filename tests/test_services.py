@@ -9,22 +9,21 @@ from services.user_service import save_user
 
 def test_create_user(test_session):
     """Testa se um usuário é criado corretamente via user_service."""
-    user = create_user("newuser", "newuser@mail.com", "securepass",
-                       test_session)
+    user = create_user("newuser", "newuser@mail.com", "securepass")
 
     assert user is not None
     assert user.email == "newuser@mail.com"
 
 
-def test_save_user(valid_user, test_session):
+def test_save_user(valid_user):
     """Testa se conseguimos salvar um usuário corretamente via user_service."""
     user = User("newuser", "newuser@mail.com", "securepass")
-    user = save_user(user, test_session)
+    user = save_user(user)
 
     assert user is not None
     assert user.email == "newuser@mail.com"
 
-    user = save_user(valid_user, test_session)
+    user = save_user(valid_user)
     assert user.login == valid_user.login
 
 
@@ -50,8 +49,7 @@ def test_save_profile(test_session, valid_user):
                              weight=80, details="Detalhes")
     profile_db = save_profile(
         user=valid_user,
-        profile=new_profile,
-        session=test_session
+        profile=new_profile
     )
 
     assert profile_db is not None

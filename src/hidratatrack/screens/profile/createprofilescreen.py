@@ -6,7 +6,7 @@ from kivymd.uix.segmentedbutton import MDSegmentedButton
 from services.profile_service import create_profile, save_profile
 from utils.snackbar_utils import show_snackbar  # NOQA
 
-from src.hidratatrack.models.models import session
+from models.models import session
 
 
 class CreateProfileScreen(MDScreen):
