@@ -19,13 +19,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'  # Altere para a versão do Python que você usa
+          python-version: '3.12'  # Altere para a versão do Python que você usa
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests with pytest
+      -  name: Check Python Version
+         run: python --version
+  
+      -  name: List Installed Packages
+         run: pip list
+      
+      - name: Run Tests with Debug
         run: |
-          python -m pytest tests/
+          set -x  # Habilita o modo de debug do bash
+          python -m pytest -v tests/
