@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # Altere para a versão do Python que você usa
+          python-version: '3.13'  # Altere para a versão do Python que você usa
 
       - name: Install dependencies
         run: |
