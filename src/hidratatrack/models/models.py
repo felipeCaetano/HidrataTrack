@@ -1,33 +1,28 @@
 from datetime import datetime, date
-from typing import List
+from typing import List, Optional
 
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import ForeignKey, func, event
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
+# import bcrypt
+from dataclasses import field
 
 table_registry = registry()
 
 
 # Configuração do mapeamento e do banco de dados
+class Observable:
+    def __init__(self):
+        self._observers = []
 
+    def add_observer(self, observer):
+        self._observers.append(observer)
 
-# class Observable:
-#     def __init__(self):
-#         self.observers = []
-#
-#     def add_observer(self, observer):
-#         """Adiciona um novo observador."""
-#         if self.observers is None:
-#             self.observers = []
-#         self.observers.append(observer)
-#
-#     def remove_observer(self, observer):
-#         """Remove um observador existente."""
-#         self.observers.remove(observer)
-#
-#     def notify_observers(self, *args, **kwargs):
-#         """Notifica todos os observadores sobre uma mudança."""
-#         for observer in self.observers:
-#             observer(*args, **kwargs)
+    def remove_observer(self, observer):
+        self._observers.remove(observer)
+
+    def notify_observers(self, *args, **kwargs):
+        for observer in self._observers:
+            observer(*args, **kwargs)
 
 
 # Classes mapeadas como dataclasses
@@ -37,14 +32,18 @@ class User:
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     login: Mapped[str] = mapped_column(unique=True, nullable=False)
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(nullable=False)
+    _password: Mapped[str] = mapped_column('password', nullable=False)
     profiles: Mapped[List["Profile"]] = relationship(
-        "Profile", back_populates="user", uselist=True, init=False,
-        cascade="all, delete-orphan", default_factory=list)
+        "Profile",
+        back_populates="user",
+        uselist=True,
+        init=False,
+        cascade="all, delete-orphan",
+        default_factory=list
+        )
     password_changed_at: Mapped[datetime] = mapped_column(default=func.now())
-    # last_failed_login: Mapped[datetime] = mapped_column(nullable=True)
-    # failed_login_attempts: Mapped[int] = mapped_column(default=0)
-
+    last_login: Mapped[Optional[datetime]] = mapped_column(nullable=True, default=None)
+    
     BCRYPT_WORK_FACTOR = 12
 
 
@@ -58,6 +57,7 @@ class Profile:
     gender: Mapped[str]
     weight: Mapped[float]
     details: Mapped[str] = mapped_column(nullable=True)
+    daily_goal: Mapped[float] = mapped_column(default=2000.0)
     user: Mapped["User"] = relationship("User", back_populates="profiles")
     water_intakes: Mapped[List["WaterIntake"]] = relationship(
         "WaterIntake", back_populates="profile", uselist=True, init=False,
@@ -66,7 +66,6 @@ class Profile:
     def get_age(self):
         """Calcula a idade do usuário conforme a data de nascimento."""
         today = date.today()
-        print(f'{self.birth_date}')
         age = today.year - self.birth_date.year
         if (today.month, today.day) < (
                 self.birth_date.month, self.birth_date.day):
@@ -78,13 +77,22 @@ class Profile:
 
     def update_weight(self, value):
         """Atualiza o valor do peso do usuário para value"""
-        if value > 0:
-            self.weight = value
-            self.notify_observers()
-        else:
+        if value <= 0:
             raise ValueError("O peso deve ser maior que zero!")
+        self.weight = value
+        self.daily_goal = self.calculate_goal(value)
+        self.notify_observers()
         return self.weight
-
+    
+    def get_daily_intake(self, date_: date = None) -> float:
+        """Retorna o total de água consumido em um dia específico"""
+        if date_ is None:
+            date_ = date.today()
+        return sum(
+            intake.amount for intake in self.water_intakes
+            if intake.date.date() == date_
+        )
+    
     def notify_observers(self):
         pass
 
@@ -102,3 +110,12 @@ class WaterIntake:
         """Valida o valor de amount ao criar um objeto WaterIntake."""
         if self.amount <= 0:
             raise ValueError("A quantidade de água deve ser maior que zero.")
+
+# Event Listeners para validações adicionais
+@event.listens_for(Profile, 'before_insert')
+@event.listens_for(Profile, 'before_update')
+def validate_profile(mapper, connection, target):
+    if target.weight <= 0:
+        raise ValueError("O peso deve ser maior que zero!")
+    if target.birth_date > datetime.now():
+        raise ValueError("A data de nascimento não pode ser no futuro!")

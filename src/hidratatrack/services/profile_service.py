@@ -1,6 +1,9 @@
+from sqlalchemy.orm import Session
+
+from services.database import get_session
 from services.events import EventEmitter
 
-from models.models import Profile, session, User
+from models.models import Profile, User
 
 profile_events = EventEmitter()
 
@@ -16,7 +19,7 @@ def create_profile(user: User, profile_name, date_obj, gender, weight, details):
     return user_profile
 
 
-def save_profile(user, profile: Profile):
+def save_profile(user, profile: Profile, session: Session=get_session()):
     existing_profile = session.query(Profile).filter_by(name=profile.name).first()
     if existing_profile:
         profile_events.emit("profile-warning",

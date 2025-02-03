@@ -1,4 +1,5 @@
 from models.models import User
+from services.database import get_session
 from services.events import EventEmitter
 from sqlalchemy.orm import Session
 from models.security import hash_password
@@ -14,7 +15,7 @@ def create_user(name, email, password):
     return user
 
 
-def get_user(identifier, session: Session=get_session):
+def get_user(identifier, session: Session=get_session()):
     """Busca um usuário pelo e-mail ou login.
 
         :param identifier: Pode ser um e-mail ou um login.
