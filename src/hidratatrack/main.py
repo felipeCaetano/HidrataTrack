@@ -7,13 +7,13 @@ from kivymd.uix.pickers import MDDockedDatePicker
 from kivymd.utils.set_bars_colors import set_bars_colors
 from sqlalchemy import func
 
-from models.models import WaterIntake, session
+from models.models import WaterIntake
+# from src.hidratatrack.services.settings import session
 from services.water_tracker import WaterTracker
 from screens.createuserscreen.createuser import CreateUserScreen    # NoQA
 from screens.login.loginscreen import LoginScreen   # NoQA
 from screens.profile.createprofilescreen import CreateProfileScreen # NoQA
 from screens.trackerscreen.trackerscreen import TrackerScreen   # NoQA
-from services.water_tracker_service import WaterIntakeService
 from utils.snackbar_utils import show_snackbar   # NoQA
 
 
@@ -112,7 +112,7 @@ class MainApp(MDApp):
             amount = float(amount)
         except Exception:
             show_snackbar("Erro no valor")
-        tracker_screen.add_water(amount, self.user, session)
+        # tracker_screen.add_water(amount, self.user, session)
 
 
     def switch_to_profile(self, user):

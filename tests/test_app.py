@@ -1,11 +1,29 @@
 import pytest
 from main import MainApp
 
-def test_main_app_initialization():
+
+def test_main_app_initialization(app):
     """Testa se a MainApp é inicializada corretamente."""
-    app = MainApp()
-    
-    assert app is not None  # Garante que a instância foi criada
-    # Se MainApp tiver um método para iniciar, podemos chamá-lo e verificar se não há erros
-    if hasattr(app, "run"):
-        app.run()  # Verifica se a aplicação inicia sem crash
+    assert app is not None  # Verifica se a aplicação foi criada
+
+    # Verifica se a aplicação tem uma tela principal configurada
+    assert hasattr(app, 'root') or hasattr(app, 'screen_manager')
+
+
+def test_screens_loaded(app):
+    """Testa se as telas foram carregadas corretamente."""
+    screen_manager = app.root
+
+    print(
+        f"ScreenManager: {screen_manager}")  # 🔍 Verificar se o root está inicializado
+    if screen_manager:
+        print(
+            f"Telas disponíveis: {[screen.name for screen in screen_manager.screens]}")
+
+    # Verifica se a tela 'tracker' existe
+    assert screen_manager is not None, "O screen_manager não foi inicializado!"
+    assert screen_manager.has_screen('tracker')
+
+    # Verifica se a tela 'login' existe
+    assert screen_manager.has_screen('login')
+

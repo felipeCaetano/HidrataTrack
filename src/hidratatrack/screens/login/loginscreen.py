@@ -1,6 +1,3 @@
-import time
-from pprint import pprint
-
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from models.models import session, User  # NoQA

@@ -1,20 +1,24 @@
 from datetime import date, datetime
 from unittest.mock import MagicMock
-from kivymd.app import MDApp
-import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from models.models import (Profile, User, table_registry)
+import pytest
+from kivy.base import EventLoop
+from kivymd.app import MDApp
+from main import MainApp
+from models.models import (Profile, table_registry, User)
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 
 @pytest.fixture
-def test_engine():
+def session():
     """Cria um banco de dados em memória para testes."""
     test_engine = create_engine("sqlite:///:memory:")  # Banco em memória
     table_registry.metadata.create_all(test_engine)  # Cria as tabelas
-    yield test_engine
+    with Session(test_engine) as session:
+        yield session
     test_engine.dispose()  # Fecha a conexão ao final dos testes
+    table_registry.metadata.drop_all(test_engine)
 
 
 @pytest.fixture
@@ -80,48 +84,22 @@ def mock_kivymd(mocker):
 
 
 @pytest.fixture()
-def test_session(test_engine):
+def test_session(session):
     """Cria uma sessão conectada ao banco de dados em memória."""
-    TestSession = sessionmaker(bind=test_engine)
+    TestSession = sessionmaker(bind=session)
     session = TestSession()
 
     # Fornece a sessão para o teste
     yield session
-    # session.rollback() 
-    # Fecha a sessão e limpa os mapeamentos ao final
-    # session.close()
-    # clear_mappers()
+    # Limpa a sessão após o teste
+    session.close()
 
-# @pytest.fixture
-# def mock_screen():
-#     """Creates a mock screen with required ids."""
-#     screen = MagicMock()
-#     screen.ids = {
-#         'login': MagicMock(text=''),
-#         'password': MagicMock(text=''),
-#         'name': MagicMock(text=''),
-#         'birth_date': MagicMock(text=''),
-#         'weight': MagicMock(text=''),
-#         'progress_label': MagicMock(text='')
-#     }
-#     return screen
 
-# @pytest.fixture
-# def app(mocker, mock_screen):
-#     """Instância do aplicativo com serviços simulados."""
-#     app = MainApp()
-
-#     # Mock the screen manager and screens
-#     app.root = MagicMock()
-#     # app.sm = app.root  # Assuming sm is an alias for root in your app
-
-#     # Set up the mock screens
-#     screens = {
-#         'login': mock_screen,
-#         'create_profile': mock_screen,
-#         'tracker': mock_screen
-#     }
-#     app.root.get_screen.side_effect = lambda name: screens[name]
-
-#     mocker.patch("utils.snackbar_utils.show_snackbar", side_effect=show_snackbar)
-#     return app
+@pytest.fixture
+def app():
+    """Inicializa a MainApp sem iniciar o loop de eventos."""
+    EventLoop.ensure_window()
+    app = MainApp()
+    # Garante que o loop de eventos do Kivy está configurado para o teste
+    app.root = app.build()
+    return app

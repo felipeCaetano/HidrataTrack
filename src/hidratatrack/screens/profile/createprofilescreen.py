@@ -6,8 +6,6 @@ from kivymd.uix.segmentedbutton import MDSegmentedButton
 from services.profile_service import create_profile, save_profile
 from utils.snackbar_utils import show_snackbar  # NOQA
 
-from models.models import session
-
 
 class CreateProfileScreen(MDScreen):
     def __init__(self, *args, **kwargs):

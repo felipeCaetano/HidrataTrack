@@ -21,7 +21,7 @@ def test_save_user(valid_user):
     user = save_user(user)
 
     assert user is not None
-    assert user.emapiil == "newuser@mail.com"
+    assert user.email == "newuser@mail.com"
 
     user = save_user(valid_user)
     assert user.login == valid_user.login

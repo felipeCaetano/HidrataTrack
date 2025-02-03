@@ -1,16 +1,13 @@
 from datetime import datetime, date
 from typing import List
 
-from sqlalchemy import create_engine, ForeignKey, func
-from sqlalchemy.orm import (Mapped, mapped_column, registry, relationship,
-                            sessionmaker)
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
+
+table_registry = registry()
+
 
 # Configuração do mapeamento e do banco de dados
-table_registry = registry()
-DATABASE_URL = "sqlite:///hydratrack.db"
-engine = create_engine(DATABASE_URL)
-Session = sessionmaker(bind=engine)
-session = Session()
 
 
 # class Observable:
@@ -105,7 +102,3 @@ class WaterIntake:
         """Valida o valor de amount ao criar um objeto WaterIntake."""
         if self.amount <= 0:
             raise ValueError("A quantidade de água deve ser maior que zero.")
-
-
-# Criar as tabelas
-table_registry.metadata.create_all(engine)

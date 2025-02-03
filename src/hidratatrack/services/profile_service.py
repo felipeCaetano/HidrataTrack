@@ -22,7 +22,7 @@ def save_profile(user, profile: Profile):
         profile_events.emit("profile-warning",
                             f"Perfil {profile.name} já existe.")
         return existing_profile
-    session.add(profile)
+    session.merge(profile)
     # session.flush()
     profile.user = user
     user.profiles.append(profile)

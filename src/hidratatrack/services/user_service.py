@@ -1,4 +1,4 @@
-from models.models import session, User
+from models.models import User
 from services.events import EventEmitter
 from sqlalchemy.orm import Session
 from models.security import hash_password
@@ -14,7 +14,7 @@ def create_user(name, email, password):
     return user
 
 
-def get_user(identifier, session: Session):
+def get_user(identifier, session: Session=get_session):
     """Busca um usuário pelo e-mail ou login.
 
         :param identifier: Pode ser um e-mail ou um login.
@@ -38,7 +38,7 @@ def save_user(user: User):
         user_events.emit("User-warning",
             f"Usuário {user.login} já existe.")
         return existing_user
-    session.add(user)
+    session.merge(user)
     session.commit()
     user_events.emit("User-events",
                      f"Usuário {user.login} salvo com sucesso.")

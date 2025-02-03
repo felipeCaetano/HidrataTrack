@@ -1,9 +1,7 @@
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
-from models.models import session
- # NoQA
+
 from services.user_service import create_user, save_user
-from utils.snackbar_utils import show_snackbar
 
 
 class CreateUserScreen(MDScreen):
