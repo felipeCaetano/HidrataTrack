@@ -19,14 +19,14 @@ def create_profile(user: User, profile_name, date_obj, gender, weight, details):
     return user_profile
 
 
-def save_profile(user, profile: Profile, session: Session=get_session()):
+def save_profile(user, profile: Profile):
+    session = next(get_session())
     existing_profile = session.query(Profile).filter_by(name=profile.name).first()
     if existing_profile:
         profile_events.emit("profile-warning",
                             f"Perfil {profile.name} já existe.")
         return existing_profile
     session.merge(profile)
-    # session.flush()
     profile.user = user
     user.profiles.append(profile)
     session.commit()

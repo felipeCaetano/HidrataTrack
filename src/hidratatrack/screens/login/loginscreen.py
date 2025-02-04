@@ -1,9 +1,8 @@
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
-from models.models import User  # NoQA
-#from models.security import hash_password  # NoQA
-from sqlalchemy.exc import SQLAlchemyError
 
+from services.auth import authenticate_user
+from services.events import EventEmitter
 from utils.snackbar_utils import show_snackbar
 
 
@@ -11,6 +10,11 @@ class LoginScreen(MDScreen):
     def __init__(self, **kwargs):
         super(LoginScreen, self).__init__(**kwargs)
         self.app = MDApp.get_running_app()
+        self.events = EventEmitter()
+        # Registra handlers para os eventos
+        self.events.on("login_failed", self.handle_login)
+        self.events.on("database_warning", self.handle_login)
+        self.events.on("warning", self.handle_login)
 
     def _validate_inputs(self, login, password):
         """Valida os campos de entrada antes de tentar autenticar"""
@@ -28,22 +32,16 @@ class LoginScreen(MDScreen):
         self.app.switch_to_profile(user) if user.profiles == [] \
             else self.app.switch_to_tracker()
 
-    # def authenticate_user(self):
-    #     """Realiza a autenticação do usuário com tratamento de erros"""
-    #     try:
-    #         login = self.ids.login.text.strip()
-    #         password = self.ids.password.text
-    #         if not self._validate_inputs(login, password):
-    #             return
-    #         user = session.query(User).filter_by(login=login).first()
-    #         if user and user.password == hash_password(password):
-    #             self._handle_successful_login(user)
-    #         else:
-    #             show_snackbar("Login ou senha inválidos.")
-    #     except SQLAlchemyError as db_error:
-    #         show_snackbar(
-    #             "Erro ao conectar com o banco de dados. Tente novamente.")
-    #         print(f"Erro de banco de dados: {str(db_error)}")
-    #     except Exception as e:
-    #         show_snackbar("Ocorreu um erro inesperado. Tente novamente.")
-    #         print(f"Erro inesperado: {str(e)}")
+    def handle_auth(self):
+        """Realiza a autenticação do usuário com tratamento de erros"""
+        login = self.ids.login.text.strip()
+        password = self.ids.password.text
+        if not self._validate_inputs(login, password):
+            return
+        user = authenticate_user(login, password)
+        if user:
+            self._handle_successful_login(user)
+
+    def handle_login(self, msg: str):
+        show_snackbar(msg)
+        

@@ -3,8 +3,9 @@ from typing import List, Optional
 
 from sqlalchemy import ForeignKey, func, event
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
-# import bcrypt
-from dataclasses import field
+
+
+from models.security import hash_password, verify_password
 
 table_registry = registry()
 
@@ -46,6 +47,19 @@ class User:
     
     BCRYPT_WORK_FACTOR = 12
 
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        self._password = hash_password(password)
+        self.password_changed_at = datetime.now()
+
+    def verify_password(self, password: str) -> bool:
+        """Verifica se a senha fornecida corresponde à senha armazenada"""
+        return verify_password(password, self._password)
+
 
 @table_registry.mapped_as_dataclass
 class Profile:
@@ -57,8 +71,8 @@ class Profile:
     gender: Mapped[str]
     weight: Mapped[float]
     details: Mapped[str] = mapped_column(nullable=True)
-    daily_goal: Mapped[float] = mapped_column(default=2000.0)
     user: Mapped["User"] = relationship("User", back_populates="profiles")
+    daily_goal: Mapped[float] = mapped_column(default=2000.0)
     water_intakes: Mapped[List["WaterIntake"]] = relationship(
         "WaterIntake", back_populates="profile", uselist=True, init=False,
         cascade="all, delete-orphan", default_factory=list)
@@ -115,7 +129,7 @@ class WaterIntake:
 @event.listens_for(Profile, 'before_insert')
 @event.listens_for(Profile, 'before_update')
 def validate_profile(mapper, connection, target):
-    if target.weight <= 0:
+    if float(target.weight) <= 0:
         raise ValueError("O peso deve ser maior que zero!")
     if target.birth_date > datetime.now():
         raise ValueError("A data de nascimento não pode ser no futuro!")

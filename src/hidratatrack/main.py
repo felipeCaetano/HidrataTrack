@@ -181,4 +181,9 @@ class MainApp(MDApp):
 
 if __name__ == "__main__":
     Window.size = (317, 715)  # não use para android ou ios
+    from services.database import create_db
+    try:
+        create_db()
+    except Exception as e:
+        print(str(e))
     MainApp().run()
