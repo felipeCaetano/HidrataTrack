@@ -40,7 +40,8 @@ class User:
         uselist=True,
         init=False,
         cascade="all, delete-orphan",
-        default_factory=list
+        default_factory=list,
+        lazy="selectin"
         )
     password_changed_at: Mapped[datetime] = mapped_column(default=func.now())
     last_login: Mapped[Optional[datetime]] = mapped_column(nullable=True, default=None)

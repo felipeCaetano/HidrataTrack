@@ -1,3 +1,6 @@
+from kivy.metrics import dp
+from kivymd.app import MDApp
+from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.screen import MDScreen
 
 from services.events import EventEmitter
@@ -13,6 +16,7 @@ class TrackerScreen(MDScreen):
         # Registra handlers para os eventos
         self.events.on("water_warning", self.handle_warning)
         self.events.on("water_added", self.handle_water_added)
+        
     
     def handle_warning(self, message: str):
         """Handler para avisos relacionados ao consumo de água."""
@@ -45,3 +49,23 @@ class TrackerScreen(MDScreen):
         self.ids.progress_label.text = f"Progresso: {daily_total} mL"
         self.ids.bar_indicator.text = f"{self.progress} %"
 
+    def menu_open(self):
+
+        menu_items = [
+            {
+            "text": f"Perfil {i}",
+                "on_release": lambda x=f"Perfil {i}": self.menu_callback(x),
+            } for i in range(5)
+        ]
+        MDDropdownMenu(
+            caller=self.ids.button,
+            items=menu_items,
+            position='bottom',
+            width=dp(160)
+        ).open()
+
+    def menu_callback(self, text_item):
+        app = MDApp.get_running_app()
+        print(app.user.profiles)
+        print(text_item)
+        self.ids.profile_button.text = text_item

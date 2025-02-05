@@ -64,8 +64,7 @@ class MainApp(MDApp):
         self.set_date_field(instance_date_picker, birth_date_field, pick_date)
 
     def set_date_field(
-            self, instance_date_picker, birth_date_field, pick_date
-    ):
+            self, instance_date_picker, birth_date_field, pick_date):
         birth_date_field.text = pick_date.strftime("%d/%m/%Y")
         instance_date_picker.dismiss()
 
@@ -103,6 +102,7 @@ class MainApp(MDApp):
         self.progress = self.water_tracker.get_progress()
         tracker_screen.ids.progress_bar.value = self.progress
         tracker_screen.ids.bar_indicator.text = f"{self.progress} %"
+        tracker_screen.ids.profile_button.text = self.user.profiles[0].name
         self.root.current = "tracker"
 
     def add_water(self, amount):

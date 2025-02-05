@@ -23,9 +23,10 @@ class LoginScreen(MDScreen):
             return False
         return True
 
-    def _handle_successful_login(self, user):
+    def _handle_successful_login(self, user, profiles):
         """Gerencia o fluxo após um login bem-sucedido"""
         self.app.user = user
+        self.app.user.profiles = profiles
         show_snackbar(f"Bem-vindo(a), {user.login}!")
         self.ids.password.text = ""
 
@@ -38,9 +39,9 @@ class LoginScreen(MDScreen):
         password = self.ids.password.text
         if not self._validate_inputs(login, password):
             return
-        user = authenticate_user(login, password)
+        user, profiles = authenticate_user(login, password)
         if user:
-            self._handle_successful_login(user)
+            self._handle_successful_login(user, profiles)
 
     def handle_login(self, msg: str):
         show_snackbar(msg)

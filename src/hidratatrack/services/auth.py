@@ -24,7 +24,8 @@ def authenticate_user(login, password):
             if user and user.verify_password(password):
                 user.last_login = datetime.now()
                 session.commit()
-                return user
+                # profiles = session.scalar(select(Profile))
+                return user, user.profiles
             else:
                 auth_emitter.emit("login_failed",
                                 "Atenção Login ou senha inválidos.")

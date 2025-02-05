@@ -17,14 +17,16 @@
         md_bg_color: self.theme_cls.backgroundColor
 
         MDButton:
-            style: "elevated"
             id: button
+            style: "elevated"
             pos_hint: {"center_x": .5, "center_y": .5}
+            on_release: root.menu_open()
             MDButtonIcon:
-                icon: "plus"
+                icon: "account-switch"
 
             MDButtonText:
-                text: "Selecionar Perfil"
+                id: profile_button
+                text: "selecionar Perfil"
 
         MDCard:
             orientation: "vertical"
