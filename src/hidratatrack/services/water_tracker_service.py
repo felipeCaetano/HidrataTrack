@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from models.models import WaterIntake
 
 
+
 class WaterIntakeService:
     def __init__(self, session):
         self.session = session
@@ -24,9 +25,9 @@ class WaterIntakeService:
         self.session.commit()
         return intake
 
-    def load_daily_intake(self, user):
+    def load_daily_intake(self, profile):
         """Carrega o consumo diário total do banco de dados."""
-        if not user:
+        if not profile:
             raise ValueError("Usuário não pode ser nulo ou inválido.")
 
         try:
@@ -34,7 +35,8 @@ class WaterIntakeService:
             total = self.session.query(
                 func.sum(WaterIntake.amount)
             ).filter(
-                WaterIntake.user_id == user.id,
+                # fazer o ajuste de capturar o profile
+                WaterIntake.profile_id == profile.id,
                 func.date(WaterIntake.date) == date.today()
             ).scalar()
 

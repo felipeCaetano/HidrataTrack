@@ -34,25 +34,26 @@ def save_user(user: User):
     :param user: Objeto do tipo User
     :return: Usuário criado.
     """
-    with get_session() as session:
-        try:
-            existing_user = session.query(User).filter_by(login=user.login).first()
-            if existing_user:
-                user_events.emit("User-warning",
-                    f"Usuário {user.login} já existe.")
-                return existing_user
-            session.merge(user)
-            session.commit()
-            user_events.emit("User-events",
-                            f"Usuário {user.login} salvo com sucesso.")
-            return user
-        except SQLAlchemyError as db_error:
-            auth_emitter.emit(
-                    "database_warning",
-                    "Erro ao conectar com o banco de dados. Tente novamente."
-                    )
-            print(f"Erro de banco de dados: {str(db_error)}")
-        except Exception as e:
-            auth_emitter.emit(
-                    "warning","Ocorreu um erro inesperado. Tente novamente.")
-            print(f"Erro inesperado: {str(e)}")
+    session = next(get_session())
+    try:
+        existing_user = session.query(User).filter_by(
+            login=user.login).first()
+        if existing_user:
+            user_events.emit("User-warning",
+                f"Usuário {user.login} já existe.")
+            return existing_user
+        session.merge(user)
+        session.commit()
+        user_events.emit("User-events",
+                        f"Usuário {user.login} salvo com sucesso.")
+        return user
+    except SQLAlchemyError as db_error:
+        auth_emitter.emit(
+                "database_warning",
+                "Erro ao conectar com o banco de dados. Tente novamente."
+                )
+        print(f"Erro de banco de dados: {str(db_error)}")
+    except Exception as e:
+        auth_emitter.emit(
+                "warning","Ocorreu um erro inesperado. Tente novamente.")
+        print(f"Erro inesperado: {str(e)}")

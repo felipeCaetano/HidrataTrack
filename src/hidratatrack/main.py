@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 from decimal import ROUND_UP, Decimal
 
@@ -15,6 +16,14 @@ from screens.login.loginscreen import LoginScreen   # NoQA
 from screens.profile.createprofilescreen import CreateProfileScreen # NoQA
 from screens.trackerscreen.trackerscreen import TrackerScreen   # NoQA
 from utils.snackbar_utils import show_snackbar   # NoQA
+
+
+# Configuração básica do logging
+logging.basicConfig(
+    level=logging.INFO,  # Nível do log (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Formato do log
+    datefmt="%Y-%m-%d %H:%M:%S"  # Formato da data/hora
+)
 
 
 class MainApp(MDApp):
@@ -91,8 +100,11 @@ class MainApp(MDApp):
             show_snackbar("Por favor, crie um perfil antes.")
             return
 
-        self.water_tracker = WaterTracker()
+        self.water_tracker = WaterTracker(self.user)
+        logging.debug(f'{self.water_tracker} criado')
         tracker_screen = self.root.get_screen("tracker")
+        self.daily_goal = self.water_tracker.daily_goal
+        logging.debug(f'{self.daily_goal=}')
         tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {
             Decimal(self.daily_goal).quantize(
                 Decimal('1.'), rounding=ROUND_UP)} mL"

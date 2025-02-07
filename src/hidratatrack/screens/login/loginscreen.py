@@ -39,9 +39,9 @@ class LoginScreen(MDScreen):
         password = self.ids.password.text
         if not self._validate_inputs(login, password):
             return
-        user, profiles = authenticate_user(login, password)
+        user, profile = authenticate_user(login, password)
         if user:
-            self._handle_successful_login(user, profiles)
+            self._handle_successful_login(user, profile)
 
     def handle_login(self, msg: str):
         show_snackbar(msg)

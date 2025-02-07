@@ -87,8 +87,8 @@ class Profile:
             age -= 1
         return age
 
-    def calculate_goal(self, peso):
-        return (float(peso) / 20) * 1000
+    def calculate_goal(self):
+        return (float(self.weight) / 20) * 1000
 
     def update_weight(self, value):
         """Atualiza o valor do peso do usuário para value"""

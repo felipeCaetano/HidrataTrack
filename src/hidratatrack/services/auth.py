@@ -19,7 +19,8 @@ def authenticate_user(login, password):
             
         try:
             user = session.scalar(
-                select(User).options(joinedload(User.profiles)).where(User.login==login)
+                select(User).options(
+                    joinedload(User.profiles)).where(User.login==login)
                 )
             if user and user.verify_password(password):
                 user.last_login = datetime.now()

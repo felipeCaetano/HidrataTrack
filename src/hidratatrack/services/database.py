@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from models.models import table_registry
 from services.settings import Settings
 
+
 engine = create_engine(Settings().DATABASE_URL)
 
 
