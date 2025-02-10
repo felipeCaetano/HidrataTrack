@@ -46,7 +46,10 @@ class WaterTracker:
             self.events.emit("water_warning",
                              "ALERTA! Você ultrapassou o consumo diário!")
         WaterIntakeService(self.session).save_water_intake(profile, amount)
-        self.events.emit("water_added", amount)
+        if amount > 1:
+            self.events.emit("water_added", f'{amount} mL adicionados!')
+        else:
+            self.events.emit("water_added", f'{amount} mL adicionado!')
 
     def reset(self):
         """Reseta o consumo diário de água para zero."""
@@ -56,13 +59,14 @@ class WaterTracker:
         """Retorna o progresso do consumo diário em porcentagem. Retorna 0 se
          a meta diária for zero."""
         if self.daily_goal == 0:
-            logging.debug("daile_goel é zer")
+            logging.debug("daile_goel é zer0")
             return 0
-        return (self.current_intake / self.daily_goal) * 100
+        return round((self.current_intake / self.daily_goal) * 100, 2)
 
     def get_current_intake(self):
         daily_total = WaterIntakeService(self.session).load_daily_intake(
             self.user.profiles[0])
+        return daily_total
 
     def update(self):
         """Recalcula a meta diária de água."""

@@ -1,26 +1,28 @@
+import logging
 from datetime import date
 
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from models.models import WaterIntake
 
+from src.hidratatrack.services.profile_service import get_profile_byname
 
 
 class WaterIntakeService:
     def __init__(self, session):
         self.session = session
 
-    def save_water_intake(self, user, amount):
+    def save_water_intake(self, profile_name, amount):
         """Salva o consumo de água no banco de dados."""
-        if not user:
-            raise ValueError("Usuário não encontrado.")
+        if not profile_name:
+            raise ValueError("Perfil não encontrado.")
         if amount <= 0:
             raise ValueError("Quantidade de água deve ser maior que zero.")
-        
-        intake = WaterIntake(
-            profile_id=user.profiles[0].id, date=date.today(), amount=amount,
-            profile=user.profiles[0]
-            )
+
+        profile = get_profile_byname(profile_name)
+        intake = WaterIntake(profile_id=profile.id, date=date.today(),
+                             amount=amount, profile=profile)
+        logging.debug(f'{profile_name}, {profile.name}')
         self.session.add(intake)
         self.session.commit()
         return intake

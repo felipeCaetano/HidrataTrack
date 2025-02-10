@@ -56,7 +56,7 @@ class TrackerScreen(MDScreen):
             amount = float(amount)
             if not user:
                 return
-            self.water_tracker.add_water(amount, self.app.user.profiles)
+            self.water_tracker.add_water(amount, self.ids.profile_button.text)
             # Atualiza progresso
             daily_total = self.water_tracker.get_current_intake()
             self.update_tracker_progress(daily_total)

@@ -21,7 +21,7 @@ def create_profile(user: User, profile_name, date_obj, gender, weight, details):
 
 def save_profile(user, profile: Profile):
     session = next(get_session())
-    existing_profile = session.query(Profile).filter_by(name=profile.name).first()
+    existing_profile = get_profile_byname(profile.name)
     if existing_profile:
         profile_events.emit("profile-warning",
                             f"Perfil {profile.name} já existe.")
@@ -33,3 +33,9 @@ def save_profile(user, profile: Profile):
     profile_events.emit("profile-event",
                         f"Perfil {profile.name} salvo com sucesso.")
     return profile
+
+def get_profile_byname(profile_name):
+    session = next(get_session())
+    existing_profile = session.query(Profile).filter_by(
+        name=profile_name).first()
+    return existing_profile

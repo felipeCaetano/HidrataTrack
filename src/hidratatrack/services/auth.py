@@ -30,6 +30,7 @@ def authenticate_user(login, password):
             else:
                 auth_emitter.emit("login_failed",
                                 "Atenção Login ou senha inválidos.")
+
         except SQLAlchemyError as db_error:
             auth_emitter.emit(
                 "database_warning",
