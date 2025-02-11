@@ -1,10 +1,16 @@
+import logging
+from kivy.uix.filechooser import error
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
 from models.models import User
 from services.database import get_session
 from services.events import EventEmitter
-from sqlalchemy.orm import Session
 from models.security import hash_password
 
+
 user_events = EventEmitter()
+
 
 def create_user(name, email, password):
     if not all([name, email, password]):
@@ -32,8 +38,7 @@ def save_user(user: User):
     """Salva um usuário no banco de dados.
 
     :param user: Objeto do tipo User
-    :return: Usuário criado.
-    """
+    :return: Usuário criado."""
     session = next(get_session())
     try:
         existing_user = session.query(User).filter_by(
@@ -48,12 +53,12 @@ def save_user(user: User):
                         f"Usuário {user.login} salvo com sucesso.")
         return user
     except SQLAlchemyError as db_error:
-        auth_emitter.emit(
+        user_events.emit(
                 "database_warning",
                 "Erro ao conectar com o banco de dados. Tente novamente."
                 )
-        print(f"Erro de banco de dados: {str(db_error)}")
+        logging.error(f"Erro de banco de dados: {str(db_error)}")
     except Exception as e:
-        auth_emitter.emit(
+        user_events.emit(
                 "warning","Ocorreu um erro inesperado. Tente novamente.")
-        print(f"Erro inesperado: {str(e)}")
+        logging.error()(f"Erro inesperado: {str(e)}")

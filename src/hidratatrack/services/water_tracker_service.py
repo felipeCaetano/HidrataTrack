@@ -46,5 +46,5 @@ class WaterIntakeService:
 
         except SQLAlchemyError as e:
             # Loga o erro e relança uma exceção
-            print(f"Erro ao carregar o consumo diário: {e}")
+            logging.error(f"Erro ao carregar o consumo diário: {e}")
             raise RuntimeError("Falha ao acessar o banco de dados.")

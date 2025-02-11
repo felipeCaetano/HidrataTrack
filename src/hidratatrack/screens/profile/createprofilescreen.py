@@ -36,8 +36,7 @@ class CreateProfileScreen(MDScreen):
                                        gender, profile_weight, details)
 
         self.app.user.profiles.append(user_profile)
-        self.app.daily_goal = self.app.user.profiles[0].calculate_goal(
-            user_profile.weight)
+        self.app.daily_goal = self.app.user.profiles[-1].calculate_goal()
         if self.app.user.profiles is not None:
             profile = save_profile(self.app.user, user_profile)
             self.app.switch_to_tracker()

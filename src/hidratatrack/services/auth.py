@@ -1,3 +1,5 @@
+import logging
+from kivy.uix.filechooser import error
 from datetime import datetime
 from typing import Annotated
 from sqlalchemy import select
@@ -25,20 +27,21 @@ def authenticate_user(login, password):
                 session.commit()
                 profiles = session.scalars(select(Profile).where(
                     Profile.user_id==user.id)).all()
-                print(type(profiles))
                 session.close()
                 return user, profiles
             else:
+                logging.error("Atenção Login ou senha inválidos.")
                 auth_emitter.emit("login_failed",
                                 "Atenção Login ou senha inválidos.")
+                return False, False
 
         except SQLAlchemyError as db_error:
             auth_emitter.emit(
                 "database_warning",
                 "Erro ao conectar com o banco de dados. Tente novamente."
                 )
-            print(f"Erro de banco de dados: {str(db_error)}")
+            logging.error(f"Erro de banco de dados: {str(db_error)}")
         except Exception as e:
             auth_emitter.emit(
                 "warning","Ocorreu um erro inesperado. Tente novamente.")
-            print(f"Erro inesperado: {str(e)}")
+            logging.error(f"Erro inesperado: {str(e)}")

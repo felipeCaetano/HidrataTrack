@@ -1,11 +1,10 @@
 from datetime import datetime
-from pprint import pprint
 
 import pytest
 
 # from models.water_tracker import WaterTracker
 
-from models.models import Profile, User, WaterIntake
+from models.models import Profile, WaterIntake
 from datetime import datetime, date
 from models.models import Profile
 

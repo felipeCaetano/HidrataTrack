@@ -4,9 +4,7 @@ from datetime import date
 from kivy.core.window import Window
 from kivymd.app import MDApp
 from kivymd.uix.pickers import MDDockedDatePicker
-from kivymd.utils.set_bars_colors import set_bars_colors
-
-# from src.hidratatrack.services.settings import session
+from kivymd.utils.set_bars_colors import set_bars_colors    # Only for Android
 from screens.createuserscreen.createuser import CreateUserScreen  # NoQA
 from screens.login.loginscreen import LoginScreen  # NoQA
 from screens.profile.createprofilescreen import CreateProfileScreen  # NoQA
@@ -27,10 +25,6 @@ class MainApp(MDApp):
         super(MainApp, self).__init__()
         self.date_dialog = None
         self.user = None
-        self.daily_goal = 0
-        self.progress = 0
-        self.current_intake = 0
-        self.water_tracker = None
         self.set_bars_colors()
 
     def build(self):
@@ -151,7 +145,7 @@ class MainApp(MDApp):
     # def load_daily_intake(self, user):
     #     """Carrega o consumo total de água do dia para o usuário."""
     #     if not user:
-    #         print("Usuário não encontrado para carregar o consumo.")
+    #         logging.warning("Usuário não encontrado para carregar o consumo.")
     #         return 0
     #
     #     daily_total = session.query(func.sum(WaterIntake.amount)).filter_by(
@@ -176,5 +170,5 @@ if __name__ == "__main__":
     try:
         create_db()
     except Exception as e:
-        print(str(e))
+        logging.error(str(e))
     MainApp().run()
