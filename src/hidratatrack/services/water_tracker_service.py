@@ -23,7 +23,7 @@ class WaterIntakeService:
         intake = WaterIntake(profile_id=profile.id, date=date.today(),
                              amount=amount, profile=profile)
         logging.debug(f'{profile_name}, {profile.name}')
-        self.session.add(intake)
+        self.session.merge(intake)
         self.session.commit()
         return intake
 

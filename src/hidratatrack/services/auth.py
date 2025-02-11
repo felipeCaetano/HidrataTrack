@@ -9,6 +9,7 @@ from models.security import hash_password
 from services.database import get_session
 from services.events import EventEmitter
 
+from src.hidratatrack.models.models import Profile
 
 auth_emitter = EventEmitter()
 
@@ -18,15 +19,15 @@ def authenticate_user(login, password):
         session = next(get_session())
             
         try:
-            user = session.scalar(
-                select(User).options(
-                    joinedload(User.profiles)).where(User.login==login)
-                )
+            user = session.scalar(select(User).where(User.login==login))
             if user and user.verify_password(password):
                 user.last_login = datetime.now()
                 session.commit()
-                # profiles = session.scalar(select(Profile))
-                return user, user.profiles
+                profiles = session.scalars(select(Profile).where(
+                    Profile.user_id==user.id)).all()
+                print(type(profiles))
+                session.close()
+                return user, profiles
             else:
                 auth_emitter.emit("login_failed",
                                 "Atenção Login ou senha inválidos.")

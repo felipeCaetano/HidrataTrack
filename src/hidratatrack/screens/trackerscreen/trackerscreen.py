@@ -30,6 +30,8 @@ class TrackerScreen(MDScreen):
     def on_enter(self, *args):
         self.menu_items = self.generate_menu_items()
         self.water_tracker = WaterTracker(self.app.user)
+        self.daily_goal = round(self.water_tracker.daily_goal, 0)
+        self.ids.daily_goal_label.text = f"Meta Diária: {self.daily_goal} mL"
         
     def generate_menu_items(self):
         menu_items = []

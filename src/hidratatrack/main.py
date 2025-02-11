@@ -1,22 +1,17 @@
 import logging
 from datetime import date
-from decimal import ROUND_UP, Decimal
 
 from kivy.core.window import Window
 from kivymd.app import MDApp
 from kivymd.uix.pickers import MDDockedDatePicker
 from kivymd.utils.set_bars_colors import set_bars_colors
-from sqlalchemy import func
 
-from models.models import WaterIntake
 # from src.hidratatrack.services.settings import session
-from services.water_tracker import WaterTracker
-from screens.createuserscreen.createuser import CreateUserScreen    # NoQA
-from screens.login.loginscreen import LoginScreen   # NoQA
-from screens.profile.createprofilescreen import CreateProfileScreen # NoQA
-from screens.trackerscreen.trackerscreen import TrackerScreen   # NoQA
-from utils.snackbar_utils import show_snackbar   # NoQA
-
+from screens.createuserscreen.createuser import CreateUserScreen  # NoQA
+from screens.login.loginscreen import LoginScreen  # NoQA
+from screens.profile.createprofilescreen import CreateProfileScreen  # NoQA
+from screens.trackerscreen.trackerscreen import TrackerScreen  # NoQA
+from utils.snackbar_utils import show_snackbar  # NoQA
 
 # Configuração básica do logging
 logging.basicConfig(
@@ -99,31 +94,15 @@ class MainApp(MDApp):
         if not self.user:
             show_snackbar("Por favor, crie um perfil antes.")
             return
-
-        self.water_tracker = WaterTracker(self.user)
-        logging.debug(f'{self.water_tracker} criado')
-        tracker_screen = self.root.get_screen("tracker")
-        self.daily_goal = self.water_tracker.daily_goal
-        logging.debug(f'{self.daily_goal=}')
-        tracker_screen.ids.daily_goal_label.text = f"Meta Diária: {
-            Decimal(self.daily_goal).quantize(
-                Decimal('1.'), rounding=ROUND_UP)} mL"
-        tracker_screen.ids.progress_label.text = f"Progresso: {
-            Decimal(self.water_tracker.current_intake).quantize(
-                Decimal('1.'), rounding=ROUND_UP)} mL"
-        self.progress = self.water_tracker.get_progress()
-        tracker_screen.ids.progress_bar.value = self.progress
-        tracker_screen.ids.bar_indicator.text = f"{self.progress} %"
-        tracker_screen.ids.profile_button.text = self.user.profiles[0].name
         self.root.current = "tracker"
 
-    def add_water(self, amount):
-        """Encaminha a adição de água para a TrackerScreen."""
-        tracker_screen = self.root.get_screen("tracker")
-        try:
-            amount = float(amount)
-        except Exception:
-            show_snackbar("Erro no valor")
+    # def add_water(self, amount):
+    #     """Encaminha a adição de água para a TrackerScreen."""
+    #     tracker_screen = self.root.get_screen("tracker")
+    #     try:
+    #         amount = float(amount)
+    #     except Exception:
+    #         show_snackbar("Erro no valor")
         # tracker_screen.add_water(amount, self.user, session)
 
 
@@ -132,63 +111,63 @@ class MainApp(MDApp):
         self.user = user
         self.root.current = "create_profile"
 
-    def update_weight(self):
-        """Update the user's weight and recalculate the daily goal."""
-        new_weight = self.root.get_screen("settings").ids.new_weight.text
+    # def update_weight(self):
+    #     """Update the user's weight and recalculate the daily goal."""
+    #     new_weight = self.root.get_screen("settings").ids.new_weight.text
+    #
+    #     if not new_weight or not self.user:
+    #         show_snackbar("Peso inválido ou perfil não criado.")
+    #         return
+    #
+    #     self.user["weight"] = float(new_weight)
+    #     self.daily_goal = (float(new_weight) / 20) * 1000
+    #     self.root.current = "menu"
 
-        if not new_weight or not self.user:
-            show_snackbar("Peso inválido ou perfil não criado.")
-            return
+    # def show_water_history(self):
+    #     """Exibe o histórico de consumo de água."""
+    #     if not self.user:
+    #         show_snackbar("Usuário não encontrado.")
+    #         return
+    #
+    #     history = self.load_water_history(self.user)
+    #     for entry in history:
+    #         show_snackbar(
+    #             f"Data: {entry.date}, Quantidade: {entry.amount} ml")
+    #
+    # def save_water_intake(self, user, amount):
+    #     """Registra o consumo de água para o usuário."""
+    #     if not user:
+    #         show_snackbar(
+    #             "Usuário não encontrado para registrar o consumo.")
+    #         return
+    #
+    #     intake = WaterIntake(user_id=user.id, date=date.today(), amount=amount)
+    #     session.add(intake)
+    #     session.commit()
+    #     show_snackbar(
+    #         f"{amount} ml de água registrados para o usuário {user.login}.")
+    #     return intake
 
-        self.user["weight"] = float(new_weight)
-        self.daily_goal = (float(new_weight) / 20) * 1000
-        self.root.current = "menu"
+    # def load_daily_intake(self, user):
+    #     """Carrega o consumo total de água do dia para o usuário."""
+    #     if not user:
+    #         print("Usuário não encontrado para carregar o consumo.")
+    #         return 0
+    #
+    #     daily_total = session.query(func.sum(WaterIntake.amount)).filter_by(
+    #         user_id=user.id).scalar()
+    #     return daily_total or 0
 
-    def show_water_history(self):
-        """Exibe o histórico de consumo de água."""
-        if not self.user:
-            show_snackbar("Usuário não encontrado.")
-            return
-
-        history = self.load_water_history(self.user)
-        for entry in history:
-            show_snackbar(
-                f"Data: {entry.date}, Quantidade: {entry.amount} ml")
-
-    def save_water_intake(self, user, amount):
-        """Registra o consumo de água para o usuário."""
-        if not user:
-            show_snackbar(
-                "Usuário não encontrado para registrar o consumo.")
-            return
-
-        intake = WaterIntake(user_id=user.id, date=date.today(), amount=amount)
-        session.add(intake)
-        session.commit()
-        show_snackbar(
-            f"{amount} ml de água registrados para o usuário {user.login}.")
-        return intake
-
-    def load_daily_intake(self, user):
-        """Carrega o consumo total de água do dia para o usuário."""
-        if not user:
-            print("Usuário não encontrado para carregar o consumo.")
-            return 0
-
-        daily_total = session.query(func.sum(WaterIntake.amount)).filter_by(
-            user_id=user.id).scalar()
-        return daily_total or 0
-
-    def load_water_history(self, user):
-        """Carrega o histórico completo de consumo de água do usuário."""
-        if not user:
-            show_snackbar(
-                "Usuário não encontrado para carregar o histórico.")
-            return []
-
-        history = session.query(WaterIntake).filter_by(user_id=user.id).all()
-        show_snackbar(f"Histórico carregado para o usuário {user.login}.")
-        return history
+    # def load_water_history(self, user):
+    #     """Carrega o histórico completo de consumo de água do usuário."""
+    #     if not user:
+    #         show_snackbar(
+    #             "Usuário não encontrado para carregar o histórico.")
+    #         return []
+    #
+    #     history = session.query(WaterIntake).filter_by(user_id=user.id).all()
+    #     show_snackbar(f"Histórico carregado para o usuário {user.login}.")
+    #     return history
 
 
 if __name__ == "__main__":

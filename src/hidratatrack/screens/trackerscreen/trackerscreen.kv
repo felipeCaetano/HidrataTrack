@@ -85,7 +85,7 @@
                 MDIconButton:
                     style: "standard"
                     icon: "water-plus"
-                    on_release: app.add_water(water_add.text)
+                    on_release: root.add_water(water_add.text)
                     md_bg_color: get_color_from_hex("#2196F3") 
             MDGridLayout:
                 adaptive_height: True
@@ -106,7 +106,7 @@
                         text: "100mL"
                 MDButton:
                     style: "filled"
-                    on_release: app.add_water(200)
+                    on_release: root.add_water(200)
                     md_bg_color: get_color_from_hex("#2196F3")
 
                     MDButtonIcon:
@@ -115,7 +115,7 @@
                         text: "200mL"
                 MDButton:
                     style: "filled"
-                    on_release: app.add_water(300)
+                    on_release: root.add_water(300)
                     md_bg_color: get_color_from_hex("#2196F3")
 
                     MDButtonIcon:
@@ -124,7 +124,7 @@
                         text: "300mL"
                 MDButton:
                     style: "filled"
-                    on_release: app.add_water(500)
+                    on_release: root.add_water(500)
                     md_bg_color: get_color_from_hex("#4CAF50")
 
                     MDButtonIcon:
@@ -134,7 +134,7 @@
                 MDButton:
                     id: personal
                     style: "filled"
-                    on_release: app.add_water(root.user_definide)
+                    on_release: root.add_water(root.user_definide)
                     md_bg_color: get_color_from_hex("#4CAF50")
 
                     MDButtonIcon:
