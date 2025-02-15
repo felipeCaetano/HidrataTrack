@@ -1,6 +1,7 @@
 from datetime import datetime
+
 import pytest
-from models.models import Profile, User, WaterIntake
+from models.models import Profile, User, WaterIntake    # NoQA
 from sqlalchemy.exc import IntegrityError
 
 
@@ -94,7 +95,7 @@ def test_profile_missing_name(test_session, valid_user):
     test_session.rollback()
 
 
-def test_profile_missing_birth_Date(test_session, valid_user):
+def test_profile_missing_birth_date(test_session, valid_user):
     # Criar perfil sem data de nascimento
     with pytest.raises(TypeError):
         profile = Profile(

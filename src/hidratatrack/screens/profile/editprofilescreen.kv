@@ -1,0 +1,130 @@
+<EditProfileScreen>:
+    md_bg_color: self.theme_cls.backgroundColor
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: "24dp"
+
+        MDTopAppBar:
+            type: "small"
+            # pos_hint: {"center_x": .5, "top": 1}
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: "arrow-left"
+            MDTopAppBarTitle:
+                text: "Editar Perfil"
+                pos_hint: {"center_x": .5}
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: "dots-vertical"
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: "12dp"
+            spacing: "12dp"
+            MDSegmentedButton:
+                id: gender_select
+                size_hint_x: 1
+                radius: "12dp"
+
+                MDSegmentedButtonItem:
+                    id: male
+                    MDSegmentButtonLabel:
+                        text: "Masculino"
+
+                MDSegmentedButtonItem:
+                    id: female
+                    MDSegmentButtonLabel:
+                        text: "Feminino"
+
+        MDTextField:
+            id: name
+            mode: "outlined"
+            size_hint: None, None
+            height: "80dp"
+            width: "248dp"
+            pos_hint: {"center_x": .5}
+            write_tab: False
+
+            MDTextFieldHintText:
+                text: "Nome"
+            MDTextFieldHelperText:
+                text: "Digite seu nome completo"
+            MDTextFieldTrailingIcon:
+                icon: "account"
+
+        MDTextField:
+            id: birth_date
+            mode: "outlined"
+            size_hint: None, None
+            height: "80dp"
+            width: "248dp"
+            pos_hint: {"center_x": .5}
+            readonly: True
+            on_focus: app.show_date_picker(self.focus)
+
+            MDTextFieldHintText:
+                text: "Data de Nascimento"
+            MDTextFieldHelperText:
+                text: "Clique para selecionar a data"
+            MDTextFieldTrailingIcon:
+                icon: "calendar"
+
+        MDTextField:
+            id: weight
+            mode: "outlined"
+            size_hint: None, None
+            height: "80dp"
+            width: "248dp"
+            pos_hint: {"center_x": .5}
+            input_filter: "float"
+            write_tab: False
+
+            MDTextFieldHintText:
+                text: "Peso (kg)"
+            MDTextFieldHelperText:
+                text: "Digite seu peso em quilogramas"
+            MDTextFieldTrailingIcon:
+                icon: "weight-kilogram"
+
+        MDTextField:
+            id: goal
+            mode: "outlined"
+            size_hint: None, None
+            height: "80dp"
+            width: "248dp"
+            pos_hint: {"center_x": .5}
+            input_filter: "float"
+            write_tab: False
+
+            MDTextFieldHintText:
+                text: "Meta Diária (mL)"
+            MDTextFieldHelperText:
+                text: "Digite seu meta diária em mL"
+            MDTextFieldTrailingIcon:
+                icon: "water-circle"
+
+        MDTextField:
+            id: details
+            mode: "outlined"
+            size_hint: None, None
+            height: "120dp"
+            width: "248dp"
+            pos_hint: {"center_x": .5}
+            write_tab: False
+            max_text_length: 500
+
+            MDTextFieldHintText:
+                text: "Detalhes adicionais"
+            MDTextFieldHelperText:
+                text: "Digite informações sobre sua saúde"
+
+        MDButton:
+            tyle: "elevated"
+            pos_hint: {"center_x": .5, "center_y": .5}
+            theme_shadow_color: "Custom"
+            shadow_color: "green"
+            on_release: root.on_edit_confirm()
+
+            MDButtonText:
+                text: "Editar"
+
+        MDWidget:

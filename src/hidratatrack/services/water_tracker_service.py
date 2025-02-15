@@ -1,9 +1,10 @@
 import logging
 from datetime import date
+from pprint import pprint
 
-from sqlalchemy import func
+from sqlalchemy import func, select
 from sqlalchemy.exc import SQLAlchemyError
-from models.models import WaterIntake
+from models.models import WaterIntake # NoQA
 
 from src.hidratatrack.services.profile_service import get_profile_byname
 
@@ -48,3 +49,15 @@ class WaterIntakeService:
             # Loga o erro e relança uma exceção
             logging.error(f"Erro ao carregar o consumo diário: {e}")
             raise RuntimeError("Falha ao acessar o banco de dados.")
+
+    def reset_daily_intakes(self, profile):
+        """Apaga o consumo diário do banco de dados."""
+        if not profile:
+            raise ValueError("Usuário não pode ser nulo ou inválido.")
+        daily_intakes = self.session.scalars(select(WaterIntake).where(
+            (WaterIntake.profile_id == profile.id)
+            & (func.date(WaterIntake.date) == date.today()))
+        ).all()
+        for daily_intake in daily_intakes:
+            self.session.delete(daily_intake)
+        self.session.commit()

@@ -1,12 +1,11 @@
 import logging
-from kivy.uix.filechooser import error
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from models.models import User
-from services.database import get_session
-from services.events import EventEmitter
-from models.security import hash_password
+from models.models import User # NoQA
+from services.database import get_session # NoQA
+from services.events import EventEmitter # NoQA
+from models.security import hash_password # NoQA
 
 
 user_events = EventEmitter()
@@ -61,4 +60,4 @@ def save_user(user: User):
     except Exception as e:
         user_events.emit(
                 "warning","Ocorreu um erro inesperado. Tente novamente.")
-        logging.error()(f"Erro inesperado: {str(e)}")
+        logging.error(f"Erro inesperado: {str(e)}")

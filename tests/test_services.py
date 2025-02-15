@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from services.user_service import create_user, get_user
-from services.profile_service import create_profile, save_profile
+from services.user_service import create_user, get_user # NoQA
+from services.profile_service import create_profile, save_profile   # NoQA
 
-from models.models import User
-from services.user_service import save_user
+from models.models import User  # NoQA
+from services.user_service import save_user # NoQA
 
 
 def test_create_user(test_session):

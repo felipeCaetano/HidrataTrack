@@ -1,9 +1,6 @@
-from sqlalchemy.orm import Session
-
-from services.database import get_session
-from services.events import EventEmitter
-
-from models.models import Profile, User
+from models.models import Profile, User     # NoQA
+from services.database import get_session   # NoQA
+from services.events import EventEmitter    # NoQA
 
 profile_events = EventEmitter()
 

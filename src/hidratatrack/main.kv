@@ -3,9 +3,13 @@
 #:include screens/profile/createprofilescreen.kv
 #:include screens/trackerscreen/trackerscreen.kv
 #:include screens/createuserscreen/createuser.kv
+#:include screens/profile/editprofilescreen.kv
 
 ScreenManager:
     transition: FadeTransition()
+
+    EditProfileScreen:
+        name: "edit_profile"
     LoginScreen:
         name: "login"
     CreateProfileScreen:
@@ -15,7 +19,4 @@ ScreenManager:
         id: tracker
     CreateUserScreen:
         name: "createuser"
-    MDScreen:
-        name: "screen1"
-        MDLabel:
-            text: "Welcome"
+

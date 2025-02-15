@@ -8,6 +8,7 @@ from kivymd.utils.set_bars_colors import set_bars_colors    # Only for Android
 from screens.createuserscreen.createuser import CreateUserScreen  # NoQA
 from screens.login.loginscreen import LoginScreen  # NoQA
 from screens.profile.createprofilescreen import CreateProfileScreen  # NoQA
+from screens.profile.editprofilescreen import EditProfileScreen  # NoQA
 from screens.trackerscreen.trackerscreen import TrackerScreen  # NoQA
 from utils.snackbar_utils import show_snackbar  # NoQA
 
@@ -105,6 +106,10 @@ class MainApp(MDApp):
         self.user = user
         self.root.current = "create_profile"
 
+    def switch_to_edit_profile(self):
+        """Switch to the edit profile screen."""
+        self.root.current = "edit_profile"
+
     # def update_weight(self):
     #     """Update the user's weight and recalculate the daily goal."""
     #     new_weight = self.root.get_screen("settings").ids.new_weight.text
@@ -165,7 +170,7 @@ class MainApp(MDApp):
 
 
 if __name__ == "__main__":
-    Window.size = (317, 715)  # não use para android ou ios
+    Window.size = (320, 720)  # não use para android ou ios
     from services.database import create_db
     try:
         create_db()

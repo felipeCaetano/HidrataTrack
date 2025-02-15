@@ -1,12 +1,8 @@
-from datetime import datetime
+from datetime import date, datetime
 
 import pytest
-
-# from models.water_tracker import WaterTracker
-
-from models.models import Profile, WaterIntake
-from datetime import datetime, date
-from models.models import Profile
+from models.models import Profile   # NoQA
+from models.models import WaterIntake   # NoQA
 
 
 def test_user_creation(valid_user):

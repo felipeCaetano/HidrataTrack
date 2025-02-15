@@ -3,7 +3,7 @@ from datetime import datetime
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.segmentedbutton import MDSegmentedButton
-from services.profile_service import create_profile, save_profile
+from services.profile_service import create_profile, save_profile   # NoQA
 from utils.snackbar_utils import show_snackbar  # NOQA
 
 

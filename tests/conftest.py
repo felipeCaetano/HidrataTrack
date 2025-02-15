@@ -4,8 +4,8 @@ from unittest.mock import MagicMock
 import pytest
 from kivy.base import EventLoop
 from kivymd.app import MDApp
-from main import MainApp
-from models.models import (Profile, table_registry, User)
+from src.hidratatrack.main import MainApp
+from models.models import (Profile, table_registry, User)   # NoQA
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 

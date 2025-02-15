@@ -20,6 +20,10 @@ pytest==8.3.4
 pytest-cov==6.0.0
 pytest-mock==3.14.0
 requests==2.32.3
-SQLAlchemy==2.0.37
+SQLAlchemy~=2.0.38
 typing_extensions==4.12.2
 urllib3==2.3.0
+
+kivymd~=2.0.1.dev0
+bcrypt~=4.2.1
+pydantic-settings~=2.7.1

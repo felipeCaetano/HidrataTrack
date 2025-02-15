@@ -1,17 +1,18 @@
-from unittest.mock import Mock, patch
-from services.water_tracker import WaterTracker
+from unittest.mock import Mock
+
+from services.water_tracker import WaterTracker # NoQA
 
 
 def test_calculate_daily_goal(user_with_profile):
     """Testa o cálculo da meta diária de água."""
     tracker = WaterTracker(user=user_with_profile)
-    assert tracker.calculate_daily_goal() == 4000  # 80kg -> 4L
+    assert tracker.calculate_daily_goal(None) == 4000  # 80kg -> 4L
 
 
 def test_calculate_daily_goal_no_profile(valid_user):
     """Testa o cálculo da meta diária quando o usuário não tem perfil."""
     tracker = WaterTracker(user=valid_user)
-    assert tracker.calculate_daily_goal() == 0
+    assert tracker.calculate_daily_goal(None) == 0
 
 
 def test_add_water(user_with_profile):

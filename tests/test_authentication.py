@@ -24,7 +24,7 @@
 #     assert user.password == valid_user.password
 
 # def test_authenticate_user_failure(valid_user):
-#     """Testa a autenticação com credenciais inválidas."""
+#     """Testa an autenticação com credenciais inválidas."""
 #     login, email, password = "invalid_user", "valid@email.com", "wrong_password"
 #     user = User(login="valid_user", email=email, password="secure_password")
 #     assert not (user.login == login and user.password == password)

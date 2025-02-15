@@ -5,7 +5,8 @@ from sqlalchemy import ForeignKey, func, event
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
 
-from models.security import hash_password, verify_password
+from models.security import hash_password, verify_password  # NoQA
+
 
 table_registry = registry()
 
@@ -96,7 +97,7 @@ class Profile:
         if value <= 0:
             raise ValueError("O peso deve ser maior que zero!")
         self.weight = value
-        self.daily_goal = self.calculate_goal(value)
+        self.daily_goal = self.calculate_goal()
         self.notify_observers()
         return self.weight
     

@@ -1,9 +1,8 @@
-from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from models.models import table_registry
-from services.settings import Settings
+from models.models import table_registry    # NoQA
+from services.settings import Settings  # NoQA
 
 
 engine = create_engine(Settings().DATABASE_URL)

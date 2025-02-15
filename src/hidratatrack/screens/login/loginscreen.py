@@ -1,9 +1,9 @@
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 
-from services.auth import authenticate_user
-from services.events import EventEmitter
-from utils.snackbar_utils import show_snackbar
+from services.auth import authenticate_user # NoQA
+from services.events import EventEmitter    # NoQA
+from utils.snackbar_utils import show_snackbar  # NoQA
 
 
 class LoginScreen(MDScreen):

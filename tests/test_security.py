@@ -1,5 +1,5 @@
 import hashlib
-from models.security import hash_password
+from models.security import hash_password   # NoQA
 
 def test_hash_password():
     """Testa se a função hash_password gera hashes corretos e consistentes."""
