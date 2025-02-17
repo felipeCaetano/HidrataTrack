@@ -1,9 +1,11 @@
 import logging
+import sys
 from datetime import date
 
 from kivy.core.window import Window
 from kivymd.app import MDApp
 from kivymd.uix.pickers import MDDockedDatePicker
+from kivymd.uix.screenmanager import MDScreenManager
 from kivymd.utils.set_bars_colors import set_bars_colors    # Only for Android
 from screens.createuserscreen.createuser import CreateUserScreen  # NoQA
 from screens.login.loginscreen import LoginScreen  # NoQA
@@ -20,16 +22,34 @@ logging.basicConfig(
 )
 
 
+class NavigationService:
+    def __init__(self, root):
+        self.manager: MDScreenManager = root
+        self.current_screen = None
+
+    def switch_to(self, screen_name):
+        if screen_name in self.manager.screen_names:
+            self.current_screen = screen_name
+            self.manager.current = self.current_screen
+        else:
+            raise ValueError(f"Screen {screen_name} not found")
+
+    def get_current_screen(self):
+        return self.current_screen
+
+
 class MainApp(MDApp):
 
     def __init__(self):
         super(MainApp, self).__init__()
         self.date_dialog = None
         self.user = None
+        self.navigation = None
         self.set_bars_colors()
 
     def build(self):
         self.title = "HidrataTrack"
+        self.navigation = NavigationService(self.root)
 
     def set_bars_colors(self):
         set_bars_colors(
@@ -38,48 +58,8 @@ class MainApp(MDApp):
             "Light",  # icons color of status bar
         )
 
-    def show_date_picker(self, focus):
-        if not focus:
-            return
-
-        self.date_dialog = MDDockedDatePicker(
-            theme_bg_color="Custom",  # Cor principal do calendário
-            scrim_color=(1, 1, 1, 0),  # Cor do texto dos botões
-            theme_text_color="Secondary",  # Cor da data atual
-            supporting_text="Selecione a data",
-            sel_year=1952
-        )
-        self.date_dialog.bind(
-            on_ok=self.on_ok,
-            on_select_day=self.on_select_day,
-            on_cancel=self.on_cancel_date,
-        )
-        self.date_dialog.open()
-
-    def on_ok(self, instance_date_picker):
-        pick_date = instance_date_picker.get_date()[0]
-        birth_date_field = self.root.get_screen(
-            "create_profile").ids.birth_date
-        self.set_date_field(instance_date_picker, birth_date_field, pick_date)
-
-    def set_date_field(
-            self, instance_date_picker, birth_date_field, pick_date):
-        birth_date_field.text = pick_date.strftime("%d/%m/%Y")
-        instance_date_picker.dismiss()
-
-    def on_select_day(self, instance, value):
-        """Esta função será chamada quando uma data for selecionada"""
-        birth_date_field = self.root.get_screen(
-            "create_profile").ids.birth_date
-        data = date(instance.sel_year, instance.sel_month, value)
-        self.set_date_field(instance, birth_date_field, data)
-
-    def on_cancel_date(self, instance):
-        """Esta função será chamada quando o usuário cancelar a seleção"""
-        instance.dismiss()
-
     def switch_to_create_account(self):
-        self.root.current = "createuser"
+        self.navigation.switch_to("createuser")
 
     def switch_to_login(self):
         self.root.current = "login"
@@ -91,89 +71,26 @@ class MainApp(MDApp):
             return
         self.root.current = "tracker"
 
-    # def add_water(self, amount):
-    #     """Encaminha a adição de água para a TrackerScreen."""
-    #     tracker_screen = self.root.get_screen("tracker")
-    #     try:
-    #         amount = float(amount)
-    #     except Exception:
-    #         show_snackbar("Erro no valor")
-        # tracker_screen.add_water(amount, self.user, session)
-
-
     def switch_to_profile(self, user):
         """Switch to the profile screen."""
         self.user = user
         self.root.current = "create_profile"
 
-    def switch_to_edit_profile(self):
+    def switch_to_edit_profile(self, profile_id):
         """Switch to the edit profile screen."""
+        if "edit_profile" not in self.root.screen_names:
+            profile_screen = EditProfileScreen(profile_id)
+            self.root.add_widget(profile_screen)
+        self.root.get_screen("edit_profile").set_profile(profile_id)
         self.root.current = "edit_profile"
-
-    # def update_weight(self):
-    #     """Update the user's weight and recalculate the daily goal."""
-    #     new_weight = self.root.get_screen("settings").ids.new_weight.text
-    #
-    #     if not new_weight or not self.user:
-    #         show_snackbar("Peso inválido ou perfil não criado.")
-    #         return
-    #
-    #     self.user["weight"] = float(new_weight)
-    #     self.daily_goal = (float(new_weight) / 20) * 1000
-    #     self.root.current = "menu"
-
-    # def show_water_history(self):
-    #     """Exibe o histórico de consumo de água."""
-    #     if not self.user:
-    #         show_snackbar("Usuário não encontrado.")
-    #         return
-    #
-    #     history = self.load_water_history(self.user)
-    #     for entry in history:
-    #         show_snackbar(
-    #             f"Data: {entry.date}, Quantidade: {entry.amount} ml")
-    #
-    # def save_water_intake(self, user, amount):
-    #     """Registra o consumo de água para o usuário."""
-    #     if not user:
-    #         show_snackbar(
-    #             "Usuário não encontrado para registrar o consumo.")
-    #         return
-    #
-    #     intake = WaterIntake(user_id=user.id, date=date.today(), amount=amount)
-    #     session.add(intake)
-    #     session.commit()
-    #     show_snackbar(
-    #         f"{amount} ml de água registrados para o usuário {user.login}.")
-    #     return intake
-
-    # def load_daily_intake(self, user):
-    #     """Carrega o consumo total de água do dia para o usuário."""
-    #     if not user:
-    #         logging.warning("Usuário não encontrado para carregar o consumo.")
-    #         return 0
-    #
-    #     daily_total = session.query(func.sum(WaterIntake.amount)).filter_by(
-    #         user_id=user.id).scalar()
-    #     return daily_total or 0
-
-    # def load_water_history(self, user):
-    #     """Carrega o histórico completo de consumo de água do usuário."""
-    #     if not user:
-    #         show_snackbar(
-    #             "Usuário não encontrado para carregar o histórico.")
-    #         return []
-    #
-    #     history = session.query(WaterIntake).filter_by(user_id=user.id).all()
-    #     show_snackbar(f"Histórico carregado para o usuário {user.login}.")
-    #     return history
 
 
 if __name__ == "__main__":
-    Window.size = (320, 720)  # não use para android ou ios
+    Window.size = (350, 720)  # não use para android ou ios
     from services.database import create_db
     try:
         create_db()
     except Exception as e:
         logging.error(str(e))
+        sys.exit(1)
     MainApp().run()

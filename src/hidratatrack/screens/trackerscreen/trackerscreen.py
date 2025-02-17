@@ -93,7 +93,12 @@ class TrackerScreen(MDScreen):
         self.profilemenu_items = self.generate_menu_items(
             self.app.user.profiles, self.profilemenu_callback)
         self.settingsmenu_items = self.generate_menu_items(
-            ["Editar Perfil", "Editar Garrafa", "Zerar Consumo"],
+            [
+                "Criar Perfil",
+                "Editar Perfil",
+                "Editar Garrafa",
+                "Zerar Consumo"
+            ],
             self.settings_menu_callback
         )
         self.water_tracker = WaterTracker(self.app.user)
@@ -185,12 +190,21 @@ class TrackerScreen(MDScreen):
 
     def settings_menu_callback(self, text_item):
         menu_actions = {
+            "Criar Perfil": self.app.switch_to_profile,
             "Editar Perfil": self.app.switch_to_edit_profile,
             "Editar Garrafa": self.show_bottle_edit,
             "Zerar Consumo": self.show_alert_dialog
         }
         self.settings_menu.dismiss()
-        menu_actions[text_item]()
+        if text_item == "Editar Perfil":
+            if not self.water_tracker.current_profile:
+                self.events.emit("profile-not_found", "Selecione um perfil.")
+                return
+            menu_actions[text_item](self.water_tracker.current_profile.id)
+        elif text_item == "Criar Perfil":
+            menu_actions[text_item](self.app.user)
+        else:
+            menu_actions[text_item]()
 
     def reset(self):
         self.water_tracker.reset()
@@ -282,7 +296,7 @@ class TrackerScreen(MDScreen):
                     style="elevated",
                     theme_shadow_color="Custom",
                     shadow_color="green",
-                    # on_release=self.on_dialog_confirm
+                    on_release=self.app.switch_to_edit_profile()
                 ),
                 spacing="8dp",
             ),

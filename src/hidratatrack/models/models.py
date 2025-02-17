@@ -132,6 +132,7 @@ class WaterIntake:
 @event.listens_for(Profile, 'before_insert')
 @event.listens_for(Profile, 'before_update')
 def validate_profile(mapper, connection, target):
+    print(f'{target.birth_date=}')
     if float(target.weight) <= 0:
         raise ValueError("O peso deve ser maior que zero!")
     if target.birth_date > datetime.now():

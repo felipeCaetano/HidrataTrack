@@ -1,9 +1,12 @@
+from sqlalchemy.exc import IntegrityError
+
 from models.models import Profile, User     # NoQA
 from services.database import get_session   # NoQA
 from services.events import EventEmitter    # NoQA
 
 profile_events = EventEmitter()
 
+session = next(get_session())
 
 def create_profile(user: User, profile_name, date_obj, gender, weight, details):
     if not all([user, profile_name, weight, gender, date_obj]):
@@ -17,7 +20,7 @@ def create_profile(user: User, profile_name, date_obj, gender, weight, details):
 
 
 def save_profile(user, profile: Profile):
-    session = next(get_session())
+
     existing_profile = get_profile_byname(profile.name)
     if existing_profile:
         profile_events.emit("profile-warning",
@@ -31,8 +34,27 @@ def save_profile(user, profile: Profile):
                         f"Perfil {profile.name} salvo com sucesso.")
     return profile
 
+
 def get_profile_byname(profile_name):
-    session = next(get_session())
+    # session = next(get_session())
     existing_profile = session.query(Profile).filter_by(
         name=profile_name).first()
     return existing_profile
+
+
+def get_profile_byid(profile_id):
+    # session = next(get_session())
+    existing_profile = session.query(
+        Profile).filter_by(id=profile_id).first()
+    return existing_profile
+
+
+def upadate_profile(profile, dt):
+    try:
+        session.add(profile)
+        session.commit()
+        profile_events.emit("profile-event",
+                                f"Perfil {profile.name} salvo com sucesso.")
+    except IntegrityError:
+        profile_events.emit("profile-warning", f"Erro ao salvar")
+

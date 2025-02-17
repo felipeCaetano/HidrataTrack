@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -13,4 +15,9 @@ def get_session():
         yield session
 
 def create_db():
-    table_registry.metadata.create_all(engine)
+    try:
+        table_registry.metadata.create_all(engine)
+        logging.info("Database tables created successfully.")
+    except Exception as e:
+        logging.error(f"Failed to create database tables: {e}")
+        raise

@@ -23,9 +23,6 @@ class WaterTracker:
         self.events = EventEmitter()
         self.session = next(get_session())
 
-        # if self.user and self.user.profiles:
-        #     self.daily_goal = self.calculate_daily_goal()
-
     def calculate_daily_goal(self, profile):
         """Calcula a meta diária de água com base no peso do perfil do
         usuário."""
@@ -78,6 +75,7 @@ class WaterTracker:
         profile_db = get_profile_byname(profile_name)
         if profile_db:
             self.current_profile = profile_db
+            self.user.current_profile = self.current_profile
             self.update()
         else:
             self.events.emit("profile-not_found", "Erro ao selecionar perfil")

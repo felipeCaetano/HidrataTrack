@@ -1,8 +1,11 @@
 <EditProfileScreen>:
+    name: "edit_profile"
     md_bg_color: self.theme_cls.backgroundColor
     MDBoxLayout:
         orientation: 'vertical'
         spacing: "24dp"
+        size_hint_x: 0.9  # Usa 90% da largura da tela
+        pos_hint: {"center_x": 0.5}
 
         MDTopAppBar:
             type: "small"
@@ -10,24 +13,26 @@
             MDTopAppBarLeadingButtonContainer:
                 MDActionTopAppBarButton:
                     icon: "arrow-left"
+                    on_release: root.show_discard_dialog()
             MDTopAppBarTitle:
                 text: "Editar Perfil"
                 pos_hint: {"center_x": .5}
             MDTopAppBarTrailingButtonContainer:
-                MDActionTopAppBarButton:
-                    icon: "dots-vertical"
+
         MDBoxLayout:
             orientation: "vertical"
             padding: "12dp"
             spacing: "12dp"
+
             MDSegmentedButton:
                 id: gender_select
                 size_hint_x: 1
+                pos_hint: {"center_x": .5}
                 radius: "12dp"
 
                 MDSegmentedButtonItem:
-                    id: male
                     MDSegmentButtonLabel:
+                        id: male
                         text: "Masculino"
 
                 MDSegmentedButtonItem:
@@ -38,9 +43,9 @@
         MDTextField:
             id: name
             mode: "outlined"
-            size_hint: None, None
+            size_hint_x: 0.8
             height: "80dp"
-            width: "248dp"
+            # width: "248dp"
             pos_hint: {"center_x": .5}
             write_tab: False
 
@@ -54,12 +59,12 @@
         MDTextField:
             id: birth_date
             mode: "outlined"
-            size_hint: None, None
+            size_hint_x: 0.8
             height: "80dp"
-            width: "248dp"
+            # width: "248dp"
             pos_hint: {"center_x": .5}
             readonly: True
-            on_focus: app.show_date_picker(self.focus)
+            on_focus: root.show_date_picker(self.focus)
 
             MDTextFieldHintText:
                 text: "Data de Nascimento"
@@ -71,26 +76,27 @@
         MDTextField:
             id: weight
             mode: "outlined"
-            size_hint: None, None
+            size_hint_x: .8
             height: "80dp"
-            width: "248dp"
+            # width: "248dp"
             pos_hint: {"center_x": .5}
             input_filter: "float"
+            helper_text_mode: "on_error"
             write_tab: False
 
             MDTextFieldHintText:
                 text: "Peso (kg)"
             MDTextFieldHelperText:
-                text: "Digite seu peso em quilogramas"
+                text: "Digite seu peso entre 5 e 300Kg"
             MDTextFieldTrailingIcon:
                 icon: "weight-kilogram"
 
         MDTextField:
             id: goal
             mode: "outlined"
-            size_hint: None, None
+            size_hint_x: 0.8
             height: "80dp"
-            width: "248dp"
+            # width: "248dp"
             pos_hint: {"center_x": .5}
             input_filter: "float"
             write_tab: False
@@ -105,9 +111,9 @@
         MDTextField:
             id: details
             mode: "outlined"
-            size_hint: None, None
-            height: "120dp"
-            width: "248dp"
+            size_hint_x: 0.8
+            height: "80dp"
+            # width: "248dp"
             pos_hint: {"center_x": .5}
             write_tab: False
             max_text_length: 500
@@ -118,13 +124,16 @@
                 text: "Digite informações sobre sua saúde"
 
         MDButton:
-            tyle: "elevated"
-            pos_hint: {"center_x": .5, "center_y": .5}
+            style: "elevated"
+            theme_width: "Custom"
+            size_hint_x: 0.8
+            pos_hint: {"center_x": .5}
             theme_shadow_color: "Custom"
             shadow_color: "green"
             on_release: root.on_edit_confirm()
 
             MDButtonText:
+                pos_hint: {"center_x": .5, "center_y": .5}
                 text: "Editar"
 
         MDWidget:
