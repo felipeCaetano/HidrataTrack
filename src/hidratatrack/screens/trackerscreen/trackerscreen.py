@@ -1,25 +1,21 @@
 import logging
-from typing import Iterable
 
 from kivy.metrics import dp
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.button import MDButton, MDButtonIcon, MDButtonText, MDIconButton
+from kivymd.uix.button import MDButton, MDButtonIcon, MDButtonText
 from kivymd.uix.dialog import MDDialog, MDDialogButtonContainer, \
     MDDialogContentContainer, MDDialogHeadlineText, MDDialogSupportingText
-from kivymd.uix.label import MDLabel
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextField, MDTextFieldHelperText, \
     MDTextFieldHintText, \
-    MDTextFieldLeadingIcon, MDTextFieldMaxLengthText, MDTextFieldTrailingIcon
-
+    MDTextFieldMaxLengthText
 from services.events import EventEmitter  # NoQA
-
 from utils.snackbar_utils import show_snackbar  # NoQA
 
-from src.hidratatrack.services.water_tracker import WaterTracker
+from services.water_tracker import WaterTracker
 
 
 class EditProfileContent(MDBoxLayout):
@@ -31,7 +27,7 @@ class EditProfileContent(MDBoxLayout):
         self.adaptive_height = True
 
         # Nome
-        self.name_field =  MDTextField(
+        self.name_field = MDTextField(
             MDTextFieldHintText(text="Nome"),
             MDTextFieldHelperText(text="altere o nome do peril",
                                   mode="persistent"),
@@ -43,7 +39,7 @@ class EditProfileContent(MDBoxLayout):
         )
 
         # Peso
-        self.weight_field =  MDTextField(
+        self.weight_field = MDTextField(
             MDTextFieldHintText(text="Peso"),
             MDTextFieldHelperText(text="Peso em Kg", mode="persistent"),
             mode="outlined",
@@ -54,7 +50,7 @@ class EditProfileContent(MDBoxLayout):
         )
 
         # Volume Personalizado
-        self.volume_field =  MDTextField(
+        self.volume_field = MDTextField(
             MDTextFieldHintText(text="volume em mL"),
             MDTextFieldHelperText(text="Helper text", mode="on_error"),
             MDTextFieldMaxLengthText(max_text_length=8),
@@ -84,7 +80,6 @@ class TrackerScreen(MDScreen):
         self.settingsmenu_items = None
         self.app = MDApp.get_running_app()
         self.events = EventEmitter()
-        # Registra handlers para os eventos
         self.events.on("water_warning", self.handle_warning)
         self.events.on("water_added", self.handle_water_added)
         self.events.on("profile-not_found", self.handle_warning)
@@ -102,7 +97,12 @@ class TrackerScreen(MDScreen):
             self.settings_menu_callback
         )
         self.water_tracker = WaterTracker(self.app.user)
-        self.update_goal()
+        self.set_profile_button(self.app.user.profiles)
+        # self.update_goal()
+        # logging.debug(self.water_tracker.current_profile)
+
+    def set_profile_button(self, profile_list):
+        self.ids.profile_button.text = self.water_tracker.current_profile.name
 
     def update_goal(self):
         self.daily_goal = round(self.water_tracker.daily_goal, 0)
@@ -150,7 +150,7 @@ class TrackerScreen(MDScreen):
             if not profile:
                 self.events.emit("profile-not_found", "Selecione um perfil.")
                 return
-            self.water_tracker.add_water(amount, self.ids.profile_button.text)
+            self.water_tracker.add_water(amount, profile)
         except ValueError as e:
             show_snackbar(str(e))
 
@@ -158,11 +158,11 @@ class TrackerScreen(MDScreen):
         """Atualiza os componentes da interface com os dados mais recentes."""
         self.update_goal()
         self.progress = self.water_tracker.get_progress()
-        logging.debug(f'{self.progress=}')
         self.ids.progress_bar.value = self.progress
         self.ids.water_add.text = ""
         self.ids.progress_label.text = f"Progresso: {daily_total} mL"
         self.ids.bar_indicator.text = f"{self.progress} %"
+        self.ids.profile_button.text = self.water_tracker.current_profile.name
 
     def menu_open(self):
         self.profile_menu = MDDropdownMenu(
@@ -176,8 +176,9 @@ class TrackerScreen(MDScreen):
     def profilemenu_callback(self, text_item):
         self.profile_menu.dismiss()
         self.ids.profile_button.text = text_item
-        self.water_tracker.set_current_profile(self.ids.profile_button.text)
+        self.water_tracker.set_current_profile(text_item)
         self.update_goal()
+        self.update_tracker_progress(self.water_tracker.get_current_intake())
 
     def show_settings(self):
         self.settings_menu = MDDropdownMenu(
@@ -303,7 +304,7 @@ class TrackerScreen(MDScreen):
         )
         self.alert_dialog.open()
 
-    def on_dialog_cancel(self,instance, *args):
+    def on_dialog_cancel(self, instance, *args):
         self.alert_dialog.dismiss()
 
     def on_dialog_confirm(self, *args):

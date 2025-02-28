@@ -19,6 +19,19 @@ class CreateProfileScreen(MDScreen):
 
     def create_profile(self):
         """Create a user profile and calculate the daily water goal."""
+        date_obj, detls, gender, pfl_name, pfl_weight = self._get_profile_fields()
+
+        user_profile = create_profile(self.app.user, pfl_name, date_obj,
+                                       gender, pfl_weight, detls)
+        logging.info(f'Profile {user_profile} created at {datetime.now()}')
+        self.app.user.profiles.append(user_profile)
+        # self.app.daily_goal = self.app.user.profiles[-1].calculate_goal()
+        if self.app.user.profiles is not None:
+             # profile = save_profile(self.app.user, user_profile)
+             self.app.switch_to_tracker()
+
+    def _get_profile_fields(self):
+        date_obj = None
         profile_name = self.ids.name.text.strip()
         birth_date = self.ids.birth_date.text
         profile_weight = self.ids.weight.text
@@ -36,15 +49,7 @@ class CreateProfileScreen(MDScreen):
             return
         else:
             date_obj = datetime.strptime(birth_date, '%d/%m/%Y')
-
-        user_profile = create_profile(self.app.user, profile_name, date_obj,
-                                       gender, profile_weight, details)
-
-        self.app.user.profiles.append(user_profile)
-        self.app.daily_goal = self.app.user.profiles[-1].calculate_goal()
-        if self.app.user.profiles is not None:
-            profile = save_profile(self.app.user, user_profile)
-            self.app.switch_to_tracker()
+        return date_obj, details, gender, profile_name, profile_weight
 
     def show_date_picker(self, focus):
         if not focus:

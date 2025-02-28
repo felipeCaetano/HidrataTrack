@@ -62,19 +62,22 @@ class MainApp(MDApp):
         self.navigation.switch_to("createuser")
 
     def switch_to_login(self):
-        self.root.current = "login"
+        self.navigation.switch_to("login")
 
     def switch_to_tracker(self):
         """Switch to the tracker screen."""
         if not self.user:
             show_snackbar("Por favor, crie um perfil antes.")
             return
-        self.root.current = "tracker"
+        self.navigation.switch_to("tracker")
 
     def switch_to_profile(self, user):
         """Switch to the profile screen."""
         self.user = user
-        self.root.current = "create_profile"
+        self.navigation.switch_to("create_profile")
+
+    def switch_to_pass(self):
+        self.navigation.switch_to("change_pass")
 
     def switch_to_edit_profile(self, profile_id):
         """Switch to the edit profile screen."""
@@ -82,7 +85,7 @@ class MainApp(MDApp):
             profile_screen = EditProfileScreen(profile_id)
             self.root.add_widget(profile_screen)
         self.root.get_screen("edit_profile").set_profile(profile_id)
-        self.root.current = "edit_profile"
+        self.navigation.switch_to("edit_profile")
 
 
 if __name__ == "__main__":

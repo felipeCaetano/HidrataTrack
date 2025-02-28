@@ -45,4 +45,7 @@ class LoginScreen(MDScreen):
 
     def handle_login(self, msg: str):
         show_snackbar(msg)
+
+    def handle_forgot_password(self):
+        pass
         

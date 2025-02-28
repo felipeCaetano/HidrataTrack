@@ -1,151 +1,154 @@
 <TrackerScreen>:
-    MDTopAppBar:
-        type: "small"
-        elevation: 2
-        pos_hint: {"center_x": .5, "top": 1}
-
-        MDTopAppBarLeadingButtonContainer:
-            MDActionTopAppBarButton:
-                icon: "menu"
-        MDTopAppBarTitle:
-            text: "Controle Diário"
-            pos_hint: {"center_x": .5}
-
-        MDTopAppBarTrailingButtonContainer:
-            MDActionTopAppBarButton:
-                id: cog
-                icon: "dots-vertical"
-                on_release: root.show_settings()
-    
-    MDBoxLayout:
-        orientation: "vertical"
-        spacing: "12dp"
-        pos_hint: {"center_x": .5, "top": 0.919}
-        padding: "16dp"
+    MDRelativeLayout:
         md_bg_color: self.theme_cls.backgroundColor
+        MDTopAppBar:
+            type: "small"
+            elevation: 2
+            pos_hint: {"center_x": .5, "top": 1}
+            md_bg_color: self.theme_cls.primaryColor
 
-        MDButton:
-            id: button
-            style: "elevated"
-            pos_hint: {"center_x": .5, "center_y": .5}
-            on_release: root.menu_open()
-            MDButtonIcon:
-                icon: "account-switch"
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: "menu"
+            MDTopAppBarTitle:
+                text: "Controle Diário"
+                pos_hint: {"center_x": .5}
 
-            MDButtonText:
-                id: profile_button
-                text: "selecionar Perfil"
-
-        MDCard:
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: cog
+                    icon: "dots-vertical"
+                    on_release: root.show_settings()
+        MDBoxLayout:
             orientation: "vertical"
-            padding: "24dp"
-            spacing: "24dp"
-            size_hint: None, None
-            size: "300dp","520dp"
-            pos_hint: {"center_x": .5}
-            elevation: 3
-            shadow_radius: 8
-            shadow_offset: (0, 4)
+            spacing: "16dp"
+            padding: ["16dp", "32dp", "16dp", "16dp"]
+            adaptive_height: True
+            pos_hint: {"center_x": .5, "center_y": .5}
 
-            MDLabel:
-                id: daily_goal_label
-                text: "Meta Diária: 0 mL"
-                halign: "center"
-                theme_text_color: "Primary"
-                font_style: "Title"
-                role: "large"
-            MDLabel:
-                id: progress_label
-                text: "Progresso: 0 mL"
-                halign: "center"
-                theme_text_color: "Secondary"
-            MDLinearProgressIndicator:
-                id: progress_bar
-                value: 0
-                indicator_color: get_color_from_hex("#2169F3")
-                # size_hint_x: .9
-                pos_hint: {"center_x": .5}
-            MDLabel:
-                id: bar_indicator
-                text: "0 %"
-                halign: "center"
-                theme_text_color: "Secondary"
-            MDBoxLayout:
-                orientation: "horizontal"
-                adaptive_size: True
-                spacing: "10dp"
+            MDButton:
+                id: button
+                style: "elevated"
+                pos_hint: {"center_x": .5, "center_y": .5}
+                on_release: root.menu_open()
+                MDButtonIcon:
+                    icon: "account-switch"
+
+                MDButtonText:
+                    id: profile_button
+                    text: "selecionar Perfil"
+
+            MDCard:
+                orientation: "vertical"
+                style: "elevated"
+                padding: "24dp"
+                spacing: "24dp"
+                size_hint: (None, None)
+                size: min(root.width - dp(32), dp(400)), self.minimum_height
                 pos_hint: {"center_x": .5}
 
-                MDTextField:
-                    id: water_add
-                    mode: "outlined"
-                    size_hint_x: None
-                    width: "200dp"
+                MDLabel:
+                    id: daily_goal_label
+                    text: "Meta Diária: 0 mL"
+                    halign: "center"
+                    theme_text_color: "Primary"
+                    font_style: "Title"
+                    role: "large"
+                MDLabel:
+                    id: progress_label
+                    text: "Progresso: 0 mL"
+                    halign: "center"
+                    theme_text_color: "Secondary"
+
+                MDLinearProgressIndicator:
+                    id: progress_bar
+                    value: 0
+                    size_hint_x: 1
+                    height: "8dp"
+                    radius: "4dp"
+                    indicator_color: get_color_from_hex("#2196F3")
+                MDLabel:
+                    id: bar_indicator
+                    text: "0 %"
+                    halign: "center"
+                    theme_text_color: "Secondary"
+                MDBoxLayout:
+                    orientation: "horizontal"
+                    adaptive_size: True
+                    spacing: "10dp"
                     pos_hint: {"center_x": .5}
-                    input_filter: "float"
-                    write_tab: False
 
-                    MDTextFieldHintText:
-                        text: "Volume"
-                    MDTextFieldHelperText:
-                        text: "Digite o volume em mL"
-                MDIconButton:
-                    style: "standard"
-                    icon: "water-plus"
-                    on_release: root.add_water(water_add.text)
-                    md_bg_color: get_color_from_hex("#2196F3")
-            MDGridLayout:
-                adaptive_height: True
-                spacing: "10dp"
-                cols: 2
-                pos_hint: {'center_x':.5}
-                size_hint_x: None  # Importante para o dimensionamento correto
-                width: self.minimum_width  # Usa a largura mínima necessária
+                    MDTextField:
+                        id: water_add
+                        mode: "outlined"
+                        size_hint_x: None
+                        width: "200dp"
+                        pos_hint: {"center_x": .5}
+                        input_filter: "float"
+                        write_tab: False
 
-                MDButton:
-                    style: "elevated"
-                    on_release: root.add_water(100)
+                        MDTextFieldHintText:
+                            text: "Volume"
+                        MDTextFieldHelperText:
+                            text: "Digite o volume em mL"
+                    MDIconButton:
+                        style: "standard"
+                        icon: "water-plus"
+                        on_release: root.add_water(water_add.text)
+                        md_bg_color: get_color_from_hex("#2196F3")
 
-                    MDButtonIcon:
-                        icon: "cup-water"
-                    MDButtonText:
-                        text: "100mL"
-                MDButton:
-                    style: "elevated"
-                    on_release: root.add_water(200)
-                    md_bg_color: get_color_from_hex("#2196F3")
+                MDGridLayout:
+                    adaptive_height: True
+                    spacing: "10dp"
+                    cols: 2
+                    pos_hint: {'center_x':.5}
+                    size_hint_x: None  # Importante para o dimensionamento correto
+                    width: self.minimum_width  # Usa a largura mínima necessária
 
-                    MDButtonIcon:
-                        icon: "cup-water"
-                    MDButtonText:
-                        text: "200mL"
-                MDButton:
-                    style: "elevated"
-                    on_release: root.add_water(300)
-                    md_bg_color: get_color_from_hex("#2196F3")
+                    MDButton:
+                        style: "elevated"
+                        on_release: root.add_water(100)
 
-                    MDButtonIcon:
-                        icon: "cup-water"
-                    MDButtonText:
-                        text: "300mL"
-                MDButton:
-                    style: "elevated"
-                    on_release: root.add_water(500)
-                    md_bg_color: get_color_from_hex("#4CAF50")
+                        MDButtonIcon:
+                            icon: "cup-water"
+                        MDButtonText:
+                            text: "100mL"
+                    MDButton:
+                        style: "elevated"
+                        on_release: root.add_water(200)
+                        md_bg_color: get_color_from_hex("#2196F3")
 
-                    MDButtonIcon:
-                        icon: "cup-water"
-                    MDButtonText:
-                        text: "500mL"
-                MDButton:
-                    id: personal
-                    style: "elevated"
-                    on_release: root.add_water(root.user_defined)
-                    md_bg_color: get_color_from_hex("#4CAF50")
+                        MDButtonIcon:
+                            icon: "cup-water"
+                        MDButtonText:
+                            text: "200mL"
+                    MDButton:
+                        style: "elevated"
+                        on_release: root.add_water(300)
+                        md_bg_color: get_color_from_hex("#2196F3")
 
-                    MDButtonIcon:
-                        icon: "bottle-soda-classic"
-                    MDButtonText:
-                        id: text
-                        text: f"{root.user_defined}mL"
-        MDWidget:
+                        MDButtonIcon:
+                            icon: "cup-water"
+                        MDButtonText:
+                            text: "300mL"
+                    MDButton:
+                        style: "elevated"
+                        on_release: root.add_water(500)
+                        md_bg_color: get_color_from_hex("#4CAF50")
+
+                        MDButtonIcon:
+                            icon: "cup-water"
+                        MDButtonText:
+                            text: "500mL"
+                    MDButton:
+                        id: personal
+                        style: "elevated"
+                        on_release: root.add_water(root.user_defined)
+                        md_bg_color: get_color_from_hex("#4CAF50")
+
+                        MDButtonIcon:
+                            icon: "bottle-soda-classic"
+                        MDButtonText:
+                            id: text
+                            text: f"{root.user_defined}mL"
+        # MDWidget:

@@ -13,9 +13,8 @@ auth_emitter = EventEmitter()
 
 
 def authenticate_user(login, password):
-        """Realiza a autenticação do usuário com tratamento de erros"""
-        session = next(get_session())
-            
+    """Realiza a autenticação do usuário com tratamento de erros"""
+    with get_session() as session:
         try:
             user = session.scalar(select(User).where(User.login == login))
             if user and user.verify_password(password):
@@ -29,7 +28,7 @@ def authenticate_user(login, password):
                 logging.error("Atenção Login ou senha inválidos.")
                 auth_emitter.emit("login_failed",
                                 "Atenção Login ou senha inválidos.")
-                return False, False
+                return None, None
 
         except SQLAlchemyError as db_error:
             auth_emitter.emit(

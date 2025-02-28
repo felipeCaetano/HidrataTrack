@@ -35,17 +35,11 @@ class User:
     login: Mapped[str] = mapped_column(unique=True, nullable=False)
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
     _password: Mapped[str] = mapped_column('password', nullable=False)
-    profiles: Mapped[List["Profile"]] = relationship(
-        "Profile",
-        back_populates="user",
-        uselist=True,
-        init=False,
-        cascade="all, delete-orphan",
-        default_factory=list,
-        lazy="selectin"
-        )
+    profiles: Mapped[list["Profile"]] = relationship(init=False,
+        cascade="all, delete-orphan", lazy='selectin')
     password_changed_at: Mapped[datetime] = mapped_column(default=func.now())
-    last_login: Mapped[Optional[datetime]] = mapped_column(nullable=True, default=None)
+    last_login: Mapped[Optional[datetime]] = mapped_column(
+        nullable=True, default=None)
     
     BCRYPT_WORK_FACTOR = 12
 
@@ -64,20 +58,34 @@ class User:
 
 
 @table_registry.mapped_as_dataclass
+class WaterIntake:
+    __tablename__ = 'water_intakes'
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey('profiles.id'),
+                                            nullable=False)
+    amount: Mapped[float] = mapped_column(nullable=False)
+    date: Mapped[datetime] = mapped_column(nullable=False)
+
+    def __post_init__(self):
+        """Valida o valor de amount ao criar um objeto WaterIntake."""
+        if self.amount <= 0:
+            raise ValueError("A quantidade de água deve ser maior que zero.")
+
+
+@table_registry.mapped_as_dataclass
 class Profile:
     __tablename__ = 'profiles'
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     name: Mapped[str] = mapped_column(unique=True, nullable=False)
     birth_date: Mapped[datetime]
     gender: Mapped[str]
     weight: Mapped[float]
     details: Mapped[str] = mapped_column(nullable=True)
-    user: Mapped["User"] = relationship("User", back_populates="profiles")
+    user: Mapped["User"] = relationship(
+        "User", back_populates="profiles", lazy='selectin')
     daily_goal: Mapped[float] = mapped_column(default=2000.0)
-    water_intakes: Mapped[List["WaterIntake"]] = relationship(
-        "WaterIntake", back_populates="profile", uselist=True, init=False,
-        cascade="all, delete-orphan", default_factory=list)
+
 
     def get_age(self):
         """Calcula a idade do usuário conforme a data de nascimento."""
@@ -98,41 +106,28 @@ class Profile:
             raise ValueError("O peso deve ser maior que zero!")
         self.weight = value
         self.daily_goal = self.calculate_goal()
-        self.notify_observers()
+        # self.notify_observers()
         return self.weight
-    
-    def get_daily_intake(self, date_: date = None) -> float:
-        """Retorna o total de água consumido em um dia específico"""
-        if date_ is None:
-            date_ = date.today()
-        return sum(
-            intake.amount for intake in self.water_intakes
-            if intake.date.date() == date_
-        )
-    
-    def notify_observers(self):
-        pass
 
+    # def get_daily_intake(self, date_: date = None) -> float:
+    #     """Retorna o total de água consumido em um dia específico"""
+    #     if date_ is None:
+    #         date_ = date.today()
+    #     return sum(
+    #         intake.amount for intake in self.water_intakes
+    #         if intake.date.date() == date_
+    #     )
 
-@table_registry.mapped_as_dataclass
-class WaterIntake:
-    __tablename__ = 'water_intakes'
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    profile_id: Mapped[int] = mapped_column(ForeignKey('profiles.id'))
-    date: Mapped[datetime] = mapped_column(nullable=False)
-    amount: Mapped[float] = mapped_column(nullable=False)
-    profile: Mapped["Profile"] = relationship("Profile", back_populates="water_intakes")
+    # def notify_observers(self):
+    #     pass
 
-    def __post_init__(self):
-        """Valida o valor de amount ao criar um objeto WaterIntake."""
-        if self.amount <= 0:
-            raise ValueError("A quantidade de água deve ser maior que zero.")
+table_registry.configure()
+
 
 # Event Listeners para validações adicionais
 @event.listens_for(Profile, 'before_insert')
 @event.listens_for(Profile, 'before_update')
 def validate_profile(mapper, connection, target):
-    print(f'{target.birth_date=}')
     if float(target.weight) <= 0:
         raise ValueError("O peso deve ser maior que zero!")
     if target.birth_date > datetime.now():

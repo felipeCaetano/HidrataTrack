@@ -38,26 +38,26 @@ def save_user(user: User):
 
     :param user: Objeto do tipo User
     :return: Usuário criado."""
-    session = next(get_session())
-    try:
-        existing_user = session.query(User).filter_by(
-            login=user.login).first()
-        if existing_user:
-            user_events.emit("User-warning",
-                f"Usuário {user.login} já existe.")
-            return existing_user
-        session.merge(user)
-        session.commit()
-        user_events.emit("User-events",
-                        f"Usuário {user.login} salvo com sucesso.")
-        return user
-    except SQLAlchemyError as db_error:
-        user_events.emit(
-                "database_warning",
-                "Erro ao conectar com o banco de dados. Tente novamente."
-                )
-        logging.error(f"Erro de banco de dados: {str(db_error)}")
-    except Exception as e:
-        user_events.emit(
-                "warning","Ocorreu um erro inesperado. Tente novamente.")
-        logging.error(f"Erro inesperado: {str(e)}")
+    with get_session() as session:
+        try:
+            existing_user = session.query(User).filter_by(
+                login=user.login).first()
+            if existing_user:
+                user_events.emit("User-warning",
+                    f"Usuário {user.login} já existe.")
+                return existing_user
+            session.merge(user)
+            session.commit()
+            user_events.emit("User-events",
+                            f"Usuário {user.login} salvo com sucesso.")
+            return user
+        except SQLAlchemyError as db_error:
+            user_events.emit(
+                    "database_warning",
+                    "Erro ao conectar com o banco de dados. Tente novamente."
+                    )
+            logging.error(f"Erro de banco de dados: {str(db_error)}")
+        except Exception as e:
+            user_events.emit(
+                    "warning","Ocorreu um erro inesperado. Tente novamente.")
+            logging.error(f"Erro inesperado: {str(e)}")

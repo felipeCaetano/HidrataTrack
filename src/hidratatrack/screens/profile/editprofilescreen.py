@@ -1,7 +1,6 @@
 import logging
 from datetime import date, datetime
 from functools import partial
-from pprint import pprint
 
 from kivy.clock import Clock
 from kivy.uix.widget import Widget
@@ -16,11 +15,11 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.pickers import MDDockedDatePicker
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.segmentedbutton import MDSegmentedButton
-from sqlalchemy.orm.sync import update
 
+from src.hidratatrack.services.database import get_session
 from src.hidratatrack.services.events import EventEmitter
 from src.hidratatrack.services.profile_service import (
-    get_profile_byid, upadate_profile)
+    get_profile_byid, update_profile)
 from src.hidratatrack.utils.snackbar_utils import show_snackbar
 
 
@@ -33,6 +32,7 @@ class EditProfileScreen(MDScreen):
         super().__init__(**kwargs)
         self.app = MDApp.get_running_app()
         self.profile_id = profile_id
+        self.session = get_session()
         self.dialog = MDDialog()
         self.events = EventEmitter()
         self.events.on('profile-event', handle_events)
@@ -42,14 +42,15 @@ class EditProfileScreen(MDScreen):
         self.profile_id = profile_id
 
     def on_edit_confirm(self, *args):
-        fields_values = self._get_fields()
-        db_profile = get_profile_byid(self.profile_id)
-        for key, value in fields_values.items():
-            if value != "":
-                setattr(db_profile, key, fields_values[key])
-        update_db = partial(upadate_profile,db_profile)
-        Clock.schedule_once(update_db, .5)
-        self.app.switch_to_tracker()
+        with self.session() as session:
+            fields_values = self._get_fields()
+            db_profile = get_profile_byid(self.profile_id, session)
+            for key, value in fields_values.items():
+                if value != "":
+                    setattr(db_profile, key, fields_values[key])
+            update_db = partial(update_profile, db_profile)
+            Clock.schedule_once(update_db, .5)
+            self.app.switch_to_tracker()
 
     def _get_fields(self):
         name = self.ids.name.text
@@ -69,7 +70,8 @@ class EditProfileScreen(MDScreen):
             logging.debug(f'Data de nascimento: {birth_date}')
             returned_fields = {
                 'name': name,
-                'birth_date': datetime.strptime(birth_date, '%d/%m/%Y'),
+                'birth_date': datetime.strptime(birth_date, '%d/%m/%Y') if
+                birth_date != "" else "",
                 'weight':weight,
                 'goal':goal,
                 'details':details,
