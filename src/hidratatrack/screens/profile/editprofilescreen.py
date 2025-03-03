@@ -7,8 +7,12 @@ from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.dialog import (
-    MDDialog, MDDialogButtonContainer, MDDialogContentContainer,
-    MDDialogHeadlineText, MDDialogIcon, MDDialogSupportingText
+    MDDialog,
+    MDDialogButtonContainer,
+    MDDialogContentContainer,
+    MDDialogHeadlineText,
+    MDDialogIcon,
+    MDDialogSupportingText,
 )
 from kivymd.uix.divider import MDDivider
 from kivymd.uix.menu import MDDropdownMenu
@@ -18,8 +22,7 @@ from kivymd.uix.segmentedbutton import MDSegmentedButton
 
 from src.hidratatrack.services.database import get_session
 from src.hidratatrack.services.events import EventEmitter
-from src.hidratatrack.services.profile_service import (
-    get_profile_byid, update_profile)
+from src.hidratatrack.services.profile_service import get_profile_byid, update_profile
 from src.hidratatrack.utils.snackbar_utils import show_snackbar
 
 
@@ -30,12 +33,20 @@ def handle_events(msg):
 class EditProfileScreen(MDScreen):
     def __init__(self, profile_id, **kwargs):
         super().__init__(**kwargs)
+        self.menu = None
         self.app = MDApp.get_running_app()
         self.profile_id = profile_id
-        self.session = get_session()
+        self.session = get_session
         self.dialog = MDDialog()
         self.events = EventEmitter()
-        self.events.on('profile-event', handle_events)
+        self.events.on("profile-event", handle_events)
+        self.date_dialog = MDDockedDatePicker(
+            theme_bg_color="Custom",  # Cor principal do calendário
+            scrim_color=(1, 1, 1, 0),  # Cor do texto dos botões
+            theme_text_color="Secondary",  # Cor da data atual
+            supporting_text="Selecione a data",
+            sel_year=1983,
+        )
 
     def set_profile(self, profile_id):
         """Define o ID do perfil que será editado"""
@@ -48,8 +59,11 @@ class EditProfileScreen(MDScreen):
             for key, value in fields_values.items():
                 if value != "":
                     setattr(db_profile, key, fields_values[key])
+                    if key == "weigth":
+                        db_profile.calculate_goal()
             update_db = partial(update_profile, db_profile)
-            Clock.schedule_once(update_db, .5)
+            Clock.schedule_once(update_db, 0.5)
+            self.events.emit("profile-updated", db_profile)
             self.app.switch_to_tracker()
 
     def _get_fields(self):
@@ -67,15 +81,18 @@ class EditProfileScreen(MDScreen):
         if all([field == "" for field in fields_list]):
             show_snackbar("Preencha ou escolha algum campo!")
         else:
-            logging.debug(f'Data de nascimento: {birth_date}')
+            logging.debug(f"Data de nascimento: {birth_date}")
             returned_fields = {
-                'name': name,
-                'birth_date': datetime.strptime(birth_date, '%d/%m/%Y') if
-                birth_date != "" else "",
-                'weight':weight,
-                'goal':goal,
-                'details':details,
-                'gender': gender_selected,
+                "name": name,
+                "birth_date": (
+                    datetime.strptime(birth_date, "%d/%m/%Y")
+                    if birth_date != ""
+                    else ""
+                ),
+                "weight": weight,
+                "goal": goal,
+                "details": details,
+                "gender": gender_selected,
             }
             return returned_fields
 
@@ -92,12 +109,12 @@ class EditProfileScreen(MDScreen):
                 MDButton(
                     MDButtonText(text="Cancelar"),
                     style="text",
-                    on_release=self.on_dismiss
+                    on_release=self.on_dismiss,
                 ),
                 MDButton(
                     MDButtonText(text="Sair"),
                     style="text",
-                    on_release=self.on_dialog_confirm
+                    on_release=self.on_dialog_confirm,
                 ),
                 spacing="8dp",
             ),
@@ -109,18 +126,16 @@ class EditProfileScreen(MDScreen):
             {
                 "text": "Limpar campos",
                 "on_release": lambda x: self.clear_fields(),
-                "icon": "refresh"
+                "icon": "refresh",
             },
             {
                 "text": "Ajuda",
                 "on_release": lambda x: self.show_help(),
-                "icon": "help-circle"
-            }
+                "icon": "help-circle",
+            },
         ]
         self.menu = MDDropdownMenu(
-            caller=self.ids.menu_button,
-            items=menu_items,
-            width_mult=3
+            caller=self.ids.menu_button, items=menu_items, width_mult=3
         )
         self.menu.open()
 
@@ -135,13 +150,6 @@ class EditProfileScreen(MDScreen):
         if not focus:
             return
 
-        self.date_dialog = MDDockedDatePicker(
-            theme_bg_color="Custom",  # Cor principal do calendário
-            scrim_color=(1, 1, 1, 0),  # Cor do texto dos botões
-            theme_text_color="Secondary",  # Cor da data atual
-            supporting_text="Selecione a data",
-            sel_year=1983
-        )
         self.date_dialog.bind(
             on_ok=self.on_ok,
             on_select_day=self.on_select_day,
@@ -154,8 +162,7 @@ class EditProfileScreen(MDScreen):
         birth_date_field = self.ids.birth_date
         self.set_date_field(instance_date_picker, birth_date_field, pick_date)
 
-    def set_date_field(
-            self, instance_date_picker, birth_date_field, pick_date):
+    def set_date_field(self, instance_date_picker, birth_date_field, pick_date):
         birth_date_field.text = pick_date.strftime("%d/%m/%Y")
         instance_date_picker.dismiss()
 

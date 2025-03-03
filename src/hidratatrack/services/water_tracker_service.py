@@ -1,12 +1,9 @@
 import logging
 from datetime import date
 
-
+from models.models import WaterIntake  # NoQA
 from sqlalchemy import func, select
 from sqlalchemy.exc import SQLAlchemyError
-from models.models import WaterIntake # NoQA
-
-from services.profile_service import get_profile_byname
 
 
 class WaterIntakeService:
@@ -20,8 +17,7 @@ class WaterIntakeService:
         if amount <= 0:
             raise ValueError("Quantidade de água deve ser maior que zero.")
 
-        intake = WaterIntake(profile_id=profile.id, date=date.today(),
-                             amount=amount)
+        intake = WaterIntake(profile_id=profile.id, date=date.today(), amount=amount)
         self.session.add(intake)
         self.session.commit()
         return intake
@@ -31,10 +27,14 @@ class WaterIntakeService:
         if not profile:
             raise ValueError("Usuário não pode ser nulo ou inválido.")
         try:
-            total = self.session.query(
-                func.sum(WaterIntake.amount)
-            ).filter(WaterIntake.profile_id == profile.id,
-                     func.date(WaterIntake.date) == date.today()).scalar()
+            total = (
+                self.session.query(func.sum(WaterIntake.amount))
+                .filter(
+                    WaterIntake.profile_id == profile.id,
+                    func.date(WaterIntake.date) == date.today(),
+                )
+                .scalar()
+            )
 
             return total or 0  # Retorna 0 se nenhum valor for encontrado
         except SQLAlchemyError as e:
@@ -45,9 +45,11 @@ class WaterIntakeService:
         """Apaga o consumo diário do banco de dados."""
         if not profile:
             raise ValueError("Usuário não pode ser nulo ou inválido.")
-        daily_intakes = self.session.scalars(select(WaterIntake).where(
-            (WaterIntake.profile_id == profile.id)
-            & (func.date(WaterIntake.date) == date.today()))
+        daily_intakes = self.session.scalars(
+            select(WaterIntake).where(
+                (WaterIntake.profile_id == profile.id)
+                & (func.date(WaterIntake.date) == date.today())
+            )
         ).all()
         for daily_intake in daily_intakes:
             self.session.delete(daily_intake)

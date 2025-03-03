@@ -1,12 +1,9 @@
-from datetime import datetime, date
-from typing import List, Optional
-
-from sqlalchemy import ForeignKey, func, event
-from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
-
+from datetime import date, datetime
+from typing import Optional
 
 from models.security import hash_password, verify_password  # NoQA
-
+from sqlalchemy import event, ForeignKey, func
+from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
 table_registry = registry()
 
@@ -30,22 +27,22 @@ class Observable:
 # Classes mapeadas como dataclasses
 @table_registry.mapped_as_dataclass
 class User:
-    __tablename__ = 'users'
+    __tablename__ = "users"
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     login: Mapped[str] = mapped_column(unique=True, nullable=False)
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
-    _password: Mapped[str] = mapped_column('password', nullable=False)
-    profiles: Mapped[list["Profile"]] = relationship(init=False,
-        cascade="all, delete-orphan", lazy='selectin')
+    _password: Mapped[str] = mapped_column("password", nullable=False)
+    profiles: Mapped[list["Profile"]] = relationship(
+        init=False, cascade="all, delete-orphan", lazy="selectin"
+    )
     password_changed_at: Mapped[datetime] = mapped_column(default=func.now())
-    last_login: Mapped[Optional[datetime]] = mapped_column(
-        nullable=True, default=None)
-    
+    last_login: Mapped[Optional[datetime]] = mapped_column(nullable=True, default=None)
+
     BCRYPT_WORK_FACTOR = 12
 
     @property
     def password(self):
-        raise AttributeError('password is not a readable attribute')
+        raise AttributeError("password is not a readable attribute")
 
     @password.setter
     def password(self, password):
@@ -59,10 +56,9 @@ class User:
 
 @table_registry.mapped_as_dataclass
 class WaterIntake:
-    __tablename__ = 'water_intakes'
+    __tablename__ = "water_intakes"
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    profile_id: Mapped[int] = mapped_column(ForeignKey('profiles.id'),
-                                            nullable=False)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("profiles.id"), nullable=False)
     amount: Mapped[float] = mapped_column(nullable=False)
     date: Mapped[datetime] = mapped_column(nullable=False)
 
@@ -74,25 +70,24 @@ class WaterIntake:
 
 @table_registry.mapped_as_dataclass
 class Profile:
-    __tablename__ = 'profiles'
+    __tablename__ = "profiles"
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     name: Mapped[str] = mapped_column(unique=True, nullable=False)
     birth_date: Mapped[datetime]
     gender: Mapped[str]
     weight: Mapped[float]
     details: Mapped[str] = mapped_column(nullable=True)
-    user: Mapped["User"] = relationship(
-        "User", back_populates="profiles", lazy='selectin')
+    bottle_volume: Mapped[float] = mapped_column(default=350.0)
+    # user: Mapped["User"] = relationship(
+    #     "User", back_populates="profiles", lazy='selectin')
     daily_goal: Mapped[float] = mapped_column(default=2000.0)
-
 
     def get_age(self):
         """Calcula a idade do usuário conforme a data de nascimento."""
         today = date.today()
         age = today.year - self.birth_date.year
-        if (today.month, today.day) < (
-                self.birth_date.month, self.birth_date.day):
+        if (today.month, today.day) < (self.birth_date.month, self.birth_date.day):
             age -= 1
         return age
 
@@ -109,24 +104,13 @@ class Profile:
         # self.notify_observers()
         return self.weight
 
-    # def get_daily_intake(self, date_: date = None) -> float:
-    #     """Retorna o total de água consumido em um dia específico"""
-    #     if date_ is None:
-    #         date_ = date.today()
-    #     return sum(
-    #         intake.amount for intake in self.water_intakes
-    #         if intake.date.date() == date_
-    #     )
-
-    # def notify_observers(self):
-    #     pass
 
 table_registry.configure()
 
 
 # Event Listeners para validações adicionais
-@event.listens_for(Profile, 'before_insert')
-@event.listens_for(Profile, 'before_update')
+@event.listens_for(Profile, "before_insert")
+@event.listens_for(Profile, "before_update")
 def validate_profile(mapper, connection, target):
     if float(target.weight) <= 0:
         raise ValueError("O peso deve ser maior que zero!")

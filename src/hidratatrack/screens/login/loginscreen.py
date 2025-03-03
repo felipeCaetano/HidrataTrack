@@ -1,8 +1,8 @@
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 
-from services.auth import authenticate_user # NoQA
-from services.events import EventEmitter    # NoQA
+from services.auth import authenticate_user  # NoQA
+from services.events import EventEmitter  # NoQA
 from utils.snackbar_utils import show_snackbar  # NoQA
 
 
@@ -11,7 +11,6 @@ class LoginScreen(MDScreen):
         super(LoginScreen, self).__init__(**kwargs)
         self.app = MDApp.get_running_app()
         self.events = EventEmitter()
-        # Registra handlers para os eventos
         self.events.on("login_failed", self.handle_login)
         self.events.on("database_warning", self.handle_login)
         self.events.on("warning", self.handle_login)
@@ -30,8 +29,11 @@ class LoginScreen(MDScreen):
         show_snackbar(f"Bem-vindo(a), {user.login}!")
         self.ids.password.text = ""
 
-        self.app.switch_to_profile(user) if user.profiles == [] \
+        (
+            self.app.switch_to_profile(user)
+            if user.profiles == []
             else self.app.switch_to_tracker()
+        )
 
     def handle_auth(self):
         """Realiza a autenticação do usuário com tratamento de erros"""
@@ -48,4 +50,3 @@ class LoginScreen(MDScreen):
 
     def handle_forgot_password(self):
         pass
-        

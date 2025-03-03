@@ -1,12 +1,10 @@
 import logging
 import sys
-from datetime import date
 
-from kivy.core.window import Window
+# from kivy.core.window import Window
 from kivymd.app import MDApp
-from kivymd.uix.pickers import MDDockedDatePicker
 from kivymd.uix.screenmanager import MDScreenManager
-from kivymd.utils.set_bars_colors import set_bars_colors    # Only for Android
+from kivymd.utils.set_bars_colors import set_bars_colors  # Only for Android
 from screens.createuserscreen.createuser import CreateUserScreen  # NoQA
 from screens.login.loginscreen import LoginScreen  # NoQA
 from screens.profile.createprofilescreen import CreateProfileScreen  # NoQA
@@ -18,7 +16,7 @@ from utils.snackbar_utils import show_snackbar  # NoQA
 logging.basicConfig(
     level=logging.INFO,  # Nível do log (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     format="%(asctime)s - %(levelname)s - %(message)s",  # Formato do log
-    datefmt="%Y-%m-%d %H:%M:%S"  # Formato da data/hora
+    datefmt="%Y-%m-%d %H:%M:%S",  # Formato da data/hora
 )
 
 
@@ -89,8 +87,8 @@ class MainApp(MDApp):
 
 
 if __name__ == "__main__":
-    Window.size = (350, 720)  # não use para android ou ios
     from services.database import create_db
+
     try:
         create_db()
     except Exception as e:

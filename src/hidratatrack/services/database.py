@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from models.models import table_registry    # NoQA
+from models.models import table_registry  # NoQA
 from services.settings import Settings  # NoQA
 
 
@@ -18,6 +18,7 @@ def get_session():
         yield session
     finally:
         session.close()
+
 
 def create_db():
     try:

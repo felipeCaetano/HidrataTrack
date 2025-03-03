@@ -1,7 +1,7 @@
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 
-from services.user_service import create_user, save_user    # NoQA
+from services.user_service import create_user, save_user  # NoQA
 
 
 class CreateUserScreen(MDScreen):
@@ -21,9 +21,9 @@ class CreateUserScreen(MDScreen):
             self.switch_to_login()
 
     def clear_fields(self):
-        self.ids.login.text = ''
-        self.ids.email.text = ''
-        self.ids.password.text = ''
+        self.ids.login.text = ""
+        self.ids.email.text = ""
+        self.ids.password.text = ""
 
     def switch_to_login(self):
         self.app.switch_to_login()
